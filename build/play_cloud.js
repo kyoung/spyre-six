@@ -2,7 +2,7 @@
 var ctx = new AudioContext();
 
 var vco = ctx.createOscillator();
-vco.type = vco.SINE;
+vco.type = "sine";
 vco.start();
 
 var vca = ctx.createGain();

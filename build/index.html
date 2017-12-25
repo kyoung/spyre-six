@@ -3,60 +3,19 @@
 <head>
   <title>Spyre</title>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="{% static 'style.css' %}">
+  <link rel="stylesheet" href="style.css">
   <script src="main.js"></script>
-  <script type="text/javascript" charset="utf-8" src="https://d3js.org/d3.v3.min.js"></script>
 </head>
 <body>
-  <svg class="d3"></svg>
   <div id="elm"></div>
   <script src="play_cloud.js"></script>
   <script>
       var node = document.getElementById('elm');
       var app = Elm.Main.embed(node);
-      var state = {'cloud':[], 'minTime':0, 'maxTime':1, 'minFreq':0, 'maxFreq': 100};
-      var cloud = [{'time': 1, 'frequency': 100}]
-
-
-
-      var x_width  = 500;
-      var y_height = 200;
-      var chart = d3.select( '.d3' )
-        .attr( 'width', x_width )
-        .attr( 'height', y_height );
-
-      var path = chart.selectAll( 'circle' )
-                      .data(cloud);
-
-      var calc_cx = function ( d ) {
-        return ( ( d.time - state.minTime ) / (state.maxTime - state.minTime) ) * x_width
-      }
-
-      var calc_cy = function ( d ) {
-        return ( ( d.frequency - state.minFreq ) / (state.maxFreq - state.minFreq) ) * y_height
-      }
-
-      path.enter()
-          .append( 'circle' )
-          .attr( 'cx', calc_cx )
-          .attr( 'cy', calc_cy )
-          .attr( 'r', '2' )
-          .style( 'fill', 'red' );
-
-      path.exit().remove();
+      var state;
 
       app.ports.drawCloud.subscribe( function(s) {
         state = s;
-        cloud = s.cloud;
-        path = chart.selectAll('circle')
-                    .data(cloud);
-        path.enter()
-            .append( 'circle' )
-            .attr( 'cx', calc_cx )
-            .attr( 'cy', calc_cy )
-            .attr( 'r', '2' )
-            .style( 'fill', 'red' );
-        path.exit().remove();
       })
 
       app.ports.playCloud.subscribe( function(s) {
