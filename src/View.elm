@@ -34,8 +34,9 @@ calc_cx model point =
 calc_cy : Model -> Point -> String
 calc_cy model point =
     toString
-        (toFloat
-            (point.frequency - model.minFreq)
+        (200
+            - toFloat
+                (point.frequency - model.minFreq)
             / toFloat (model.maxFreq - model.minFreq)
             * 200
         )

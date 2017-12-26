@@ -15,6 +15,11 @@ makeFreqs minF maxF count =
     Random.generate AddFreqs <| Random.list count (Random.int minF maxF)
 
 
+makeNotes : Int -> Int -> Int -> Cmd Msg
+makeNotes minNote maxNote count =
+    Random.generate AddNotes <| Random.list count (Random.int minNote maxNote)
+
+
 makeTimbers : Int -> Cmd Msg
 makeTimbers count =
     Random.generate AddTimbers <| Random.list count (Random.int minTimber maxTimber)

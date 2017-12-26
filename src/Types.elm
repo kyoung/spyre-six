@@ -15,11 +15,14 @@ type alias Model =
     , maxTime : Int
     , minFreq : Int
     , maxFreq : Int
+    , minNote : Int
+    , maxNote : Int
     }
 
 
 type Msg
     = MakeCloud
+    | AddNotes (List Int)
     | AddFreqs (List Int)
     | AddTimbers (List Int)
     | AddTimes (List Int)

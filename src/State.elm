@@ -1,6 +1,6 @@
 module State exposing (..)
 
-import Commands exposing (makeCloud, makeFreqs, makeTimbers, makeTimes)
+import Commands exposing (makeCloud, makeFreqs, makeNotes, makeTimbers, makeTimes)
 import Ports exposing (drawCloud, playCloud)
 import Random
 import Types exposing (Model, Msg(..), Point)
@@ -14,8 +14,10 @@ init =
       , maxTime = 4000
       , minFreq = 27
       , maxFreq = 4200
+      , minNote = 210
+      , maxNote = 1080
       }
-    , makeFreqs 27 4200 1000
+    , makeNotes 210 1080 1000
     )
 
 
@@ -23,8 +25,17 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
     case action of
         MakeCloud ->
-            ( { model | cloud = makeCloud model.cloudCount }
-            , makeFreqs model.minFreq model.maxFreq model.cloudCount
+            ( { model | cloud = makeCloud model.cloudCount } {- , makeFreqs model.minFreq model.maxFreq model.cloudCount -}
+            , makeNotes model.minNote model.maxNote model.cloudCount
+            )
+
+        AddNotes notes ->
+            ( { model
+                | cloud = addFreqs model.cloud (List.map noteToFreq notes)
+                , minFreq = noteToFreq model.minNote
+                , maxFreq = noteToFreq model.maxNote
+              }
+            , makeTimbers model.cloudCount
             )
 
         AddFreqs freqs ->
@@ -54,6 +65,11 @@ addFreqs cloud freqs =
 addFreq : Point -> Int -> Point
 addFreq point freq =
     { point | frequency = freq }
+
+
+noteToFreq : Int -> Int
+noteToFreq midiNote =
+    round (2 ^ ((toFloat midiNote - 690) / 120) * 440)
 
 
 addTimbers : List Point -> List Int -> List Point
