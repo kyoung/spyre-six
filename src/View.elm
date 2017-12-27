@@ -21,35 +21,45 @@ stats model =
         [ text (toString model.cloudCount ++ " points") ]
 
 
-calc_cx : Model -> Point -> String
-calc_cx model point =
+calc_cx : Int -> Int -> Point -> String
+calc_cx min_ max_ point =
     toString
         (toFloat
-            (point.time - model.minTime)
-            / toFloat (model.maxTime - model.minTime)
-            * 500
+            (point.time - min_)
+            / toFloat (max_ - min_)
+            * 1000
         )
 
 
-calc_cy : Model -> Point -> String
-calc_cy model point =
+calc_cy : Int -> Int -> Point -> String
+calc_cy min_ max_ point =
     toString
-        (200
+        (400
             - toFloat
-                (point.frequency - model.minFreq)
-            / toFloat (model.maxFreq - model.minFreq)
-            * 200
+                (point.frequency - min_)
+            / toFloat (max_ - min_)
+            * 400
         )
 
 
 cloudDrawing : Model -> Html Msg
 cloudDrawing model =
-    Svg.svg [ style "width: 500px; height: 200px" ]
+    Svg.svg [ style "width: 1000px; height: 400px" ]
         (List.map
             (\note ->
                 Svg.circle
-                    [ cx (calc_cx model note)
-                    , cy (calc_cy model note)
+                    [ cx
+                        (calc_cx
+                            model.ranges.minTime
+                            model.ranges.maxTime
+                            note
+                        )
+                    , cy
+                        (calc_cy
+                            model.ranges.minFreq
+                            model.ranges.maxFreq
+                            note
+                        )
                     , r "2"
                     ]
                     []

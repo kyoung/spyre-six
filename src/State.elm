@@ -1,6 +1,6 @@
 module State exposing (..)
 
-import Commands exposing (makeCloud, makeFreqs, makeNotes, makeTimbers, makeTimes)
+import Commands exposing (makeCloud, makeSequence)
 import Ports exposing (drawCloud, playCloud)
 import Random
 import Types exposing (Model, Msg(..), Point)
@@ -8,44 +8,64 @@ import Types exposing (Model, Msg(..), Point)
 
 init : ( Model, Cmd Msg )
 init =
-    ( { cloud = makeCloud 1000
-      , cloudCount = 1000
-      , minTime = 1000
-      , maxTime = 4000
-      , minFreq = 27
-      , maxFreq = 4200
-      , minNote = 210
-      , maxNote = 1080
+    ( { cloud = makeCloud 5000
+      , cloudCount = 5000
+      , ranges =
+            { minTime = 1
+            , maxTime = 16000
+            , minFreq = 27
+            , maxFreq = 4200
+            , minNote = 210
+            , maxNote = 1080
+            , minTimber = 10
+            , maxTimber = 5000
+            }
       }
-    , makeNotes 210 1080 1000
+    , makeSequence AddNotes 210 1080 5000
     )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
-    case action of
-        MakeCloud ->
-            ( { model | cloud = makeCloud model.cloudCount } {- , makeFreqs model.minFreq model.maxFreq model.cloudCount -}
-            , makeNotes model.minNote model.maxNote model.cloudCount
-            )
+    let
+        oldRanges =
+            model.ranges
 
+        newRanges =
+            { oldRanges
+                | minFreq = noteToFreq oldRanges.minNote
+                , maxFreq = noteToFreq oldRanges.maxNote
+            }
+    in
+    case action of
         AddNotes notes ->
             ( { model
                 | cloud = addFreqs model.cloud (List.map noteToFreq notes)
-                , minFreq = noteToFreq model.minNote
-                , maxFreq = noteToFreq model.maxNote
+                , ranges = newRanges
               }
-            , makeTimbers model.cloudCount
+            , makeSequence
+                AddTimbers
+                model.ranges.minTimber
+                model.ranges.maxTimber
+                model.cloudCount
             )
 
         AddFreqs freqs ->
             ( { model | cloud = addFreqs model.cloud freqs }
-            , makeTimbers model.cloudCount
+            , makeSequence
+                AddTimbers
+                model.ranges.minTimber
+                model.ranges.maxTimber
+                model.cloudCount
             )
 
         AddTimbers timbers ->
             ( { model | cloud = addTimbers model.cloud timbers }
-            , makeTimes model.minTime model.maxTime model.cloudCount
+            , makeSequence
+                AddTimes
+                model.ranges.minTime
+                model.ranges.maxTime
+                model.cloudCount
             )
 
         AddTimes times ->
