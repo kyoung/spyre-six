@@ -1,9 +1,10 @@
 module State exposing (..)
 
 import Commands exposing (makeCloud, makeSequence)
+import Filters exposing (baseA, createMajorKeyFilter)
 import Ports exposing (drawCloud, playCloud)
 import Random
-import Types exposing (Model, Msg(..), Point)
+import Types exposing (FreqFilter, Model, Msg(..), Point)
 
 
 init : ( Model, Cmd Msg )
@@ -20,6 +21,13 @@ init =
             , minTimber = 10
             , maxTimber = 5000
             }
+      , freqFilters =
+            [ { frequencies = createMajorKeyFilter baseA
+              , applyFrom = 0
+              , applyTo = 4200
+              , margin = 50
+              }
+            ]
       }
     , makeSequence AddNotes 210 1080 5000
     )
@@ -50,15 +58,6 @@ update action model =
                 model.cloudCount
             )
 
-        AddFreqs freqs ->
-            ( { model | cloud = addFreqs model.cloud freqs }
-            , makeSequence
-                AddTimbers
-                model.ranges.minTimber
-                model.ranges.maxTimber
-                model.cloudCount
-            )
-
         AddTimbers timbers ->
             ( { model | cloud = addTimbers model.cloud timbers }
             , makeSequence
@@ -69,12 +68,27 @@ update action model =
             )
 
         AddTimes times ->
-            ( { model | cloud = addTimes model.cloud times }
+            ( { model
+                | cloud =
+                    applyFilters
+                        model.freqFilters
+                        (addTimes model.cloud times)
+              }
             , drawCloud { model | cloud = addTimes model.cloud times }
             )
 
         PlayCloud ->
             ( model, playCloud "play" )
+
+
+applyFilters : List FreqFilter -> List Point -> List Point
+applyFilters filters cloud =
+    List.foldl applyFilter cloud filters
+
+
+applyFilter : FreqFilter -> List Point -> List Point
+applyFilter filter_ cloud =
+    List.filter (\p -> List.member p.frequency filter_.frequencies) cloud
 
 
 addFreqs : List Point -> List Int -> List Point

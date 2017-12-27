@@ -22,14 +22,22 @@ type alias Ranges =
 
 type alias Model =
     { cloud : List Point
+    , freqFilters : List FreqFilter
     , cloudCount : Int
     , ranges : Ranges
     }
 
 
+type alias FreqFilter =
+    { frequencies : List Int
+    , margin : Int
+    , applyFrom : Int
+    , applyTo : Int
+    }
+
+
 type Msg
     = AddNotes (List Int)
-    | AddFreqs (List Int)
     | AddTimbers (List Int)
     | AddTimes (List Int)
     | PlayCloud
