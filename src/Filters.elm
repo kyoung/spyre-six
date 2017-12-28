@@ -25,5 +25,5 @@ createMajorKeyFilter baseFreq =
     List.concat
         (List.map
             (\oct -> List.map (\f -> f * oct) baseList)
-            (List.range 1 5)
+            (List.range 1 6)
         )

@@ -1,6 +1,6 @@
 
 var ctx = new AudioContext();
-var voices = 16;
+var voices = 32;
 
 var testBeat = [ {'time': 250, 'timber': 100, 'frequency': 400}
                , {'time': 500, 'timber': 100, 'frequency': 200}
@@ -15,10 +15,10 @@ var testBeat = [ {'time': 250, 'timber': 100, 'frequency': 400}
 var vcos = Array.from(Array(voices)).map(function(_, i) {
     var c = ctx.createOscillator();
     switch (true) {
-      case i < 2:
+      case i < 4:
         c.type = 'square';
         break;
-      case i < 4:
+      case i < 8:
         c.type = 'triangle';
         break;
       default:
@@ -77,15 +77,15 @@ function playNotes(voicePool, notes) {
 }
 
 async function playPercusion( notes ) {
-  playNotes([0, 1], notes);
+  playNotes([0, 1, 2, 3], notes);
 }
 
 async function playMelodic( notes ) {
-  playNotes([2, 3, 4, 5, 6, 7], notes)
+  playNotes([4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], notes)
 }
 
 async function playPads( notes ) {
-  playNotes([8, 9, 10, 11, 12, 13, 14, 15], notes)
+  playNotes([16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31], notes)
 }
 
 function sleep (ms) {
