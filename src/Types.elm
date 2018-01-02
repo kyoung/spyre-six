@@ -5,6 +5,8 @@ type alias Point =
     { frequency : Int
     , timber : Int
     , time : Int
+    , rhythm : Int
+    , velocity : Int
     }
 
 

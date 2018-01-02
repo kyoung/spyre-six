@@ -76,7 +76,7 @@ update action model =
                 | cloud =
                     applyFilters
                         model.freqFilters
-                        (addTimes model.cloud (List.map beatToTime beats))
+                        (addRhythms model.cloud beats)
                 , ranges = newRanges
               }
             , drawCloud
@@ -135,6 +135,23 @@ beatToTime beatVal =
     round (toFloat beatVal / (bpm / 60.0 / 1000.0 * bpmModifier))
 
 
+beatToVelocity : Int -> Int
+beatToVelocity beatVal =
+    -- assume a 4/4, 120bpm
+    -- 100 at each note, ie when beatVal modulo 16 == 0
+    -- 80 at each beat, ie when beatVal modulo 4 == 0
+    -- 50 at each demi, ie when beatVal modulo 2 == 0
+    -- 30 else
+    if beatVal % 16 == 0 then
+        100
+    else if beatVal % 4 == 0 then
+        50
+    else if beatVal % 2 == 0 then
+        30
+    else
+        10
+
+
 addTimbers : List Point -> List Int -> List Point
 addTimbers cloud timbers =
     List.map2 addTimber cloud timbers
@@ -153,3 +170,12 @@ addTimes cloud times =
 addTime : Point -> Int -> Point
 addTime point time =
     { point | time = time }
+
+
+addRhythms : List Point -> List Int -> List Point
+addRhythms cloud rhythms =
+    List.map2 addRhythm cloud rhythms
+
+
+addRhythm point rhythm =
+    { point | rhythm = rhythm, time = beatToTime rhythm, velocity = beatToVelocity rhythm }

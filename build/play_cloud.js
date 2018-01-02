@@ -67,7 +67,7 @@ function playNotes(voicePool, notes) {
       var voice = voicePool[ freeVoice ]
       voiceMux[ freeVoice ] = true;
       vcos[voice].frequency.value = note.frequency;
-      vcas[voice].gain.value = 1;
+      vcas[voice].gain.value = note.velocity / 100;
       setTimeout( function() {
         vcas[voice].gain.value = 0;
         voiceMux[ freeVoice ] = false;

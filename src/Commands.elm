@@ -6,7 +6,7 @@ import Types exposing (Msg(..), Point)
 
 makeCloud : Int -> List Point
 makeCloud count =
-    List.repeat count (Point 0 0 0)
+    List.repeat count (Point 0 0 0 0 100)
 
 
 makeSequence : (List Int -> Msg) -> Int -> Int -> Int -> Cmd Msg
