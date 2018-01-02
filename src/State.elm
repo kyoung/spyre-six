@@ -9,8 +9,8 @@ import Types exposing (FreqFilter, Model, Msg(..), Point)
 
 init : ( Model, Cmd Msg )
 init =
-    ( { cloud = makeCloud 5000
-      , cloudCount = 5000
+    ( { cloud = makeCloud 1000
+      , cloudCount = 1000
       , ranges =
             { minTime = 1
             , maxTime = 16000
@@ -29,7 +29,7 @@ init =
               }
             ]
       }
-    , makeSequence AddNotes 210 1080 5000
+    , makeSequence AddNotes 210 1080 1000
     )
 
 
