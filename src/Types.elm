@@ -11,6 +11,8 @@ type alias Point =
 type alias Ranges =
     { minTime : Int
     , maxTime : Int
+    , minRhythm : Int
+    , maxRhythm : Int
     , minFreq : Int
     , maxFreq : Int
     , minNote : Int
@@ -39,5 +41,5 @@ type alias FreqFilter =
 type Msg
     = AddNotes (List Int)
     | AddTimbers (List Int)
-    | AddTimes (List Int)
+    | AddRhythm (List Int)
     | PlayCloud

@@ -14,6 +14,8 @@ init =
       , ranges =
             { minTime = 1
             , maxTime = 16000
+            , minRhythm = 1
+            , maxRhythm = 64
             , minFreq = 27
             , maxFreq = 4200
             , minNote = 210
@@ -43,6 +45,8 @@ update action model =
             { oldRanges
                 | minFreq = noteToFreq oldRanges.minNote
                 , maxFreq = noteToFreq oldRanges.maxNote
+                , minTime = beatToTime oldRanges.minRhythm
+                , maxTime = beatToTime oldRanges.maxRhythm
             }
     in
     case action of
@@ -61,20 +65,29 @@ update action model =
         AddTimbers timbers ->
             ( { model | cloud = addTimbers model.cloud timbers }
             , makeSequence
-                AddTimes
-                model.ranges.minTime
-                model.ranges.maxTime
+                AddRhythm
+                model.ranges.minRhythm
+                model.ranges.maxRhythm
                 model.cloudCount
             )
 
-        AddTimes times ->
+        AddRhythm beats ->
             ( { model
                 | cloud =
                     applyFilters
                         model.freqFilters
-                        (addTimes model.cloud times)
+                        (addTimes model.cloud (List.map beatToTime beats))
+                , ranges = newRanges
               }
-            , drawCloud { model | cloud = addTimes model.cloud times }
+            , drawCloud
+                { model
+                    | cloud =
+                        addTimes model.cloud
+                            (List.map
+                                beatToTime
+                                beats
+                            )
+                }
             )
 
         PlayCloud ->
@@ -104,6 +117,22 @@ addFreq point freq =
 noteToFreq : Int -> Int
 noteToFreq midiNote =
     round (2 ^ ((toFloat midiNote - 690) / 120) * 440)
+
+
+beatToTime : Int -> Int
+beatToTime beatVal =
+    -- assume a 4/4, 120bpm
+    -- each beat maps to a 16th note in that range...
+    let
+        -- quarter notes
+        bpm =
+            120.0
+
+        -- 16th notes, AKA bpm multiplier
+        bpmModifier =
+            4.0
+    in
+    round (toFloat beatVal / (bpm / 60.0 / 1000.0 * bpmModifier))
 
 
 addTimbers : List Point -> List Int -> List Point
