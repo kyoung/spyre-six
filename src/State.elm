@@ -76,17 +76,16 @@ update action model =
                 | cloud =
                     applyFilters
                         model.freqFilters
-                        (addRhythms model.cloud beats)
+                        (List.map tampPads (addRhythms model.cloud beats))
                 , ranges = newRanges
               }
             , drawCloud
                 { model
                     | cloud =
-                        addTimes model.cloud
-                            (List.map
-                                beatToTime
-                                beats
-                            )
+                        applyFilters
+                            model.freqFilters
+                            (List.map tampPads (addRhythms model.cloud beats))
+                    , ranges = newRanges
                 }
             )
 
@@ -150,6 +149,16 @@ beatToVelocity beatVal =
         30
     else
         10
+
+
+tampPads : Point -> Point
+tampPads point =
+    -- the pad points need to be muted a bit...
+    -- >500ms == pad
+    if point.timber > 500 then
+        { point | velocity = 5 }
+    else
+        point
 
 
 addTimbers : List Point -> List Int -> List Point
