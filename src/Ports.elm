@@ -10,3 +10,9 @@ port drawCloud : Model -> Cmd msg
 
 
 port playCloud : String -> Cmd msg
+
+
+port makeCloud : CloudSeed -> Cmd msg
+
+
+port gotCloud : (List Point -> msg) -> Sub msg

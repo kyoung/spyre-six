@@ -22,6 +22,10 @@
         playCloud( state );
       } )
 
+      app.ports.makeCloud.subscribe( function(seed) {
+        app.ports.gotCloud.send( makeCloud( seed ) )
+      } )
+
   </script>
 </body>
 </html>

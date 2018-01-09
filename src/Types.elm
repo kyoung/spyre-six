@@ -40,6 +40,62 @@ type alias FreqFilter =
     }
 
 
+type alias TimeSignature =
+    { noteValue : Int
+    , beats : Int
+    }
+
+
+type Wave
+    = Sine
+    | Triangle
+    | Square
+
+
+type alias ADSR =
+    { attack : Int
+    , decay : Int
+    , sustain : Int
+    , release : Int
+    }
+
+
+type alias Voice =
+    { waveform : Wave
+    , adsr : ADSR
+    , gain : Int
+    }
+
+
+type alias Register =
+    { voices : List Voice
+    , lowerTimber : Int
+    , upperTimber : Int
+    , name : String
+    }
+
+
+type alias CloudSeed =
+    { key : Int
+    , tsig : TimeSignature
+    , count : Int
+    , ranges : Ranges
+    }
+
+
+type alias Cloud =
+    { cloud : List Point
+    , seed : CloudSeed
+    , registers : List Register
+    }
+
+
+type alias NeoModel =
+    { clouds : List Cloud
+    , sequence : List Int
+    }
+
+
 type Msg
     = AddNotes (List Int)
     | AddTimbers (List Int)
