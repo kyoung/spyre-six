@@ -138,9 +138,9 @@ beatToVelocity : Int -> Int
 beatToVelocity beatVal =
     -- assume a 4/4, 120bpm
     -- 100 at each note, ie when beatVal modulo 16 == 0
-    -- 80 at each beat, ie when beatVal modulo 4 == 0
-    -- 50 at each demi, ie when beatVal modulo 2 == 0
-    -- 30 else
+    -- 50 at each beat, ie when beatVal modulo 4 == 0
+    -- 30 at each demi, ie when beatVal modulo 2 == 0
+    -- 10 else
     if beatVal % 16 == 0 then
         100
     else if beatVal % 4 == 0 then
@@ -156,7 +156,7 @@ tampPads point =
     -- the pad points need to be muted a bit...
     -- >500ms == pad
     if point.timber > 500 then
-        { point | velocity = 5 }
+        { point | velocity = 30 }
     else
         point
 

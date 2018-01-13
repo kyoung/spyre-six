@@ -1,6 +1,6 @@
 port module Ports exposing (..)
 
-import Types exposing (Model)
+import Types exposing (CloudSeed, Model, Point)
 
 
 --port for sending out cloud data for D3 to graph

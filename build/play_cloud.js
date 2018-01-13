@@ -1,6 +1,7 @@
 
 var ctx = new AudioContext();
 var voices = 32;
+var playLoop = true;
 
 var testBeat = [ {'time': 250, 'timber': 100, 'frequency': 400}
                , {'time': 500, 'timber': 100, 'frequency': 200}
@@ -52,6 +53,12 @@ async function playCloud( state ) {
   playPercusion(percusiveNotes);
   playMelodic(melodicNotes);
   playPads(padNotes);
+
+  if ( playLoop ) {
+    setTimeout( function() {
+      playCloud( state );
+    }, notes[notes.length -1 ].time )
+  }
 
 }
 
