@@ -9,21 +9,24 @@
 <body>
   <div id="elm"></div>
   <script src="play_cloud.js"></script>
+  <script src="make_cloud.js"></script>
   <script>
       var node = document.getElementById('elm');
       var app = Elm.Main.embed(node);
       var state;
+      var fullState;
 
-      app.ports.drawCloud.subscribe( function(s) {
-        state = s;
-      })
 
       app.ports.playCloud.subscribe( function(s) {
+        fullState = s;
         playCloud( state );
       } )
 
-      app.ports.makeCloud.subscribe( function(seed) {
-        app.ports.gotCloud.send( makeCloud( seed ) )
+      app.ports.makeCloud.subscribe( function(json_seed) {
+        let seed = JSON.parse(json_seed)
+        app.ports.gotCloud.send(
+            { "points": makeCloud( seed ), "cloudId": seed.cloudId }
+        )
       } )
 
   </script>

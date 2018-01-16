@@ -11,20 +11,14 @@ type alias Point =
 
 
 type alias Ranges =
-    { minTime : Int
-    , maxTime : Int
-    , minRhythm : Int
-    , maxRhythm : Int
-    , minFreq : Int
-    , maxFreq : Int
-    , minNote : Int
+    { minNote : Int
     , maxNote : Int
     , minTimber : Int
     , maxTimber : Int
     }
 
 
-type alias Model =
+type alias OldModel =
     { cloud : List Point
     , freqFilters : List FreqFilter
     , cloudCount : Int
@@ -55,7 +49,7 @@ type Wave
 type alias ADSR =
     { attack : Int
     , decay : Int
-    , sustain : Int
+    , sustain : Float
     , release : Int
     }
 
@@ -80,24 +74,30 @@ type alias CloudSeed =
     , tsig : TimeSignature
     , count : Int
     , ranges : Ranges
+    , bars : Int
+    , cloudId : Int
     }
 
 
 type alias Cloud =
-    { cloud : List Point
+    { points : List Point
     , seed : CloudSeed
     , registers : List Register
+    , id : Int
     }
 
 
-type alias NeoModel =
+type alias CloudResponse =
+    { points : List Point, cloudId : Int }
+
+
+type alias Model =
     { clouds : List Cloud
     , sequence : List Int
+    , loop : Bool
     }
 
 
 type Msg
-    = AddNotes (List Int)
-    | AddTimbers (List Int)
-    | AddRhythm (List Int)
+    = GotCloud CloudResponse
     | PlayCloud
