@@ -13,13 +13,12 @@
   <script>
       var node = document.getElementById('elm');
       var app = Elm.Main.embed(node);
-      var state;
       var fullState;
 
 
       app.ports.playCloud.subscribe( function(s) {
         fullState = s;
-        playCloud( state );
+        playCloud( fullState );
       } )
 
       app.ports.makeCloud.subscribe( function(json_seed) {

@@ -18,22 +18,6 @@ type alias Ranges =
     }
 
 
-type alias OldModel =
-    { cloud : List Point
-    , freqFilters : List FreqFilter
-    , cloudCount : Int
-    , ranges : Ranges
-    }
-
-
-type alias FreqFilter =
-    { frequencies : List Int
-    , margin : Int
-    , applyFrom : Int
-    , applyTo : Int
-    }
-
-
 type alias TimeSignature =
     { noteValue : Int
     , beats : Int
@@ -57,7 +41,7 @@ type alias ADSR =
 type alias Voice =
     { waveform : Wave
     , adsr : ADSR
-    , gain : Int
+    , gain : Float
     }
 
 

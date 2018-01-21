@@ -1,21 +1,78 @@
 module ToJson exposing (..)
 
-import Json.Encode exposing (Value, encode, int, object)
-import Types exposing (CloudSeed, Ranges, TimeSignature)
+import Json.Encode exposing (Value, bool, encode, float, int, list, object, string)
+import Types exposing (..)
 
 
-cloudSeedToJSON : CloudSeed -> String
+modelToJSON : Model -> Value
+modelToJSON model =
+    object
+        [ ( "clouds", list (List.map cloudToJSON model.clouds) )
+        , ( "sequence", list (List.map int model.sequence) )
+        , ( "loop", bool model.loop )
+        ]
+
+
+cloudToJSON : Cloud -> Value
+cloudToJSON cloud =
+    object
+        [ ( "points", list (List.map pointToJSON cloud.points) )
+        , ( "seed", cloudSeedToJSON cloud.seed )
+        , ( "registers", list (List.map registerToJSON cloud.registers) )
+        , ( "id", int cloud.id )
+        ]
+
+
+pointToJSON : Point -> Value
+pointToJSON point =
+    object
+        [ ( "frequency", int point.frequency )
+        , ( "timber", int point.timber )
+        , ( "time", int point.time )
+        , ( "rhythm", int point.rhythm )
+        , ( "velocity", int point.velocity )
+        ]
+
+
+registerToJSON : Register -> Value
+registerToJSON register =
+    object
+        [ ( "voices", list (List.map voiceToJSON register.voices) )
+        , ( "lowerTimber", int register.lowerTimber )
+        , ( "upperTimber", int register.upperTimber )
+        , ( "name", string register.name )
+        ]
+
+
+voiceToJSON : Voice -> Value
+voiceToJSON voice =
+    object
+        [ ( "waveform", string (toString voice.waveform) )
+        , ( "adsr", adsrToJSON voice.adsr )
+        , ( "gain", float voice.gain )
+        ]
+
+
+adsrToJSON : ADSR -> Value
+adsrToJSON adsr =
+    object
+        [ ( "attack", int adsr.attack )
+        , ( "decay", int adsr.decay )
+        , ( "sustain", float adsr.sustain )
+        , ( "release", int adsr.release )
+        ]
+
+
+cloudSeedToJSON : CloudSeed -> Value
 cloudSeedToJSON seed =
-    encode 0
-        (object
-            [ ( "key", int seed.key )
-            , ( "tsig", tsigToJSON seed.tsig )
-            , ( "count", int seed.count )
-            , ( "ranges", rangesToJSON seed.ranges )
-            , ( "bars", int seed.bars )
-            , ( "cloudId", int seed.cloudId )
-            ]
-        )
+    object
+        [ ( "key", int seed.key )
+        , ( "tsig", tsigToJSON seed.tsig )
+        , ( "count", int seed.count )
+        , ( "ranges", rangesToJSON seed.ranges )
+        , ( "bars", int seed.bars )
+        , ( "cloudId", int seed.cloudId )
+        ]
 
 
 tsigToJSON : TimeSignature -> Value
