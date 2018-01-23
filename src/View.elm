@@ -1,68 +1,173 @@
 module View exposing (..)
 
-import Html exposing (Html, div, h2, p, span, text)
-import Svg
-import Svg.Attributes exposing (..)
-import Types exposing (Model, Msg, Point)
+import Html exposing (Html, button, div, h2, hr, p, span, text)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
+import Types exposing (ADSR, Cloud, CloudSeed, Model, Msg(..), Register, Voice, Wave)
 
 
 root : Model -> Html Msg
 root model =
     div []
-        [ h2 [] [ text "Spyre Six" ]
-        , stats model
-        , cloudDrawing model
+        [ h2 [ class "spyre" ] [ text "Spyre Six" ]
+        , playBar model.loop model.sequence
+        , cloudsDisplay model
         ]
 
 
-stats : Model -> Html Msg
-stats model =
+playBar : Bool -> List Int -> Html Msg
+playBar looping sequence =
+    div [ class "bubble" ]
+        [ span [ class "bubbleTitle" ] [ text "Playback" ]
+        , div []
+            [ button [ onClick PlayCloud ] [ text "Play" ]
+            , button [] [ text "Loop" ]
+            , drawSequence sequence
+            ]
+        ]
+
+
+drawSequence : List Int -> Html Msg
+drawSequence sequence =
+    if List.length sequence > 1 then
+        span [ class "informational" ] (emphasisCombo [ "Sequence", List.foldr (++) "" (List.map toString sequence) ] 1)
+    else
+        span [] []
+
+
+cloudsDisplay : Model -> Html Msg
+cloudsDisplay model =
+    div [ class "clouds" ]
+        (List.map cloudControls model.clouds)
+
+
+cloudControls : Cloud -> Html Msg
+cloudControls cloud =
+    div [ class "bubble", class "cloudControl" ]
+        [ span [ class "bubbleTitle" ] [ text ("Cloud " ++ toString cloud.id) ]
+        , drawCloudSeed cloud.seed
+        , div [ class "registers" ] (List.map drawRegister cloud.registers)
+        ]
+
+
+drawCloudSeed : CloudSeed -> Html Msg
+drawCloudSeed seed =
     div []
-        [ text (toString model.cloudCount ++ " points") ]
-
-
-calc_cx : Int -> Int -> Point -> String
-calc_cx min_ max_ point =
-    toString
-        (toFloat
-            (point.time - min_)
-            / toFloat (max_ - min_)
-            * 1000
-        )
-
-
-calc_cy : Int -> Int -> Point -> String
-calc_cy min_ max_ point =
-    toString
-        (400
-            - toFloat
-                (point.frequency - min_)
-            / toFloat (max_ - min_)
-            * 400
-        )
-
-
-cloudDrawing : Model -> Html Msg
-cloudDrawing model =
-    Svg.svg [ style "width: 1000px; height: 400px" ]
-        (List.map
-            (\note ->
-                Svg.circle
-                    [ cx
-                        (calc_cx
-                            model.ranges.minTime
-                            model.ranges.maxTime
-                            note
-                        )
-                    , cy
-                        (calc_cy
-                            model.ranges.minFreq
-                            model.ranges.maxFreq
-                            note
-                        )
-                    , r "2"
-                    ]
-                    []
+        [ div [ class "informational" ] (emphasisCombo [ toString seed.count, "points" ] 0)
+        , div [ class "informational" ] (emphasisCombo [ "Key", toString seed.key ] 1)
+        , div [ class "informational" ]
+            (emphasisCombo
+                [ "Signature"
+                , toString seed.tsig.beats ++ "/" ++ toString seed.tsig.noteValue
+                ]
+                1
             )
-            model.cloud
-        )
+        , div [ class "informational" ] (emphasisCombo [ "Bars", toString seed.bars ] 1)
+        ]
+
+
+drawRegister : Register -> Html Msg
+drawRegister register =
+    div [ class "bubble", class "register" ]
+        [ span [ class "bubbleTitle" ] [ text (register.name ++ " voices") ]
+        , div []
+            [ div [ class "informational" ] [ text ("lower timber " ++ toString register.lowerTimber) ]
+            , div [ class "informational" ] [ text ("upper timber " ++ toString register.upperTimber) ]
+            , hr [] []
+            ]
+        , div [ class "voiceBox" ] (List.map drawVoice register.voices)
+        ]
+
+
+drawVoice : Voice -> Html Msg
+drawVoice voice =
+    div [ class "voice" ]
+        [ div [ class "informational" ] (emphasisCombo [ "Waveform", toString voice.waveform ] 1)
+        , drawADSR voice.adsr
+        , drawGain voice.gain
+        ]
+
+
+drawADSR : ADSR -> Html Msg
+drawADSR adsr =
+    div [ class "adsr" ]
+        [ div [ class "informational" ] (emphasisCombo [ "Attack", toString adsr.attack, "ms" ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Decay", toString adsr.decay, "ms" ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Sustain", toString (adsr.sustain * 100), "%" ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Release", toString adsr.release, "ms" ] 1)
+        ]
+
+
+drawGain : Float -> Html Msg
+drawGain gain =
+    div [ class "gain" ]
+        [ div [ class "informational" ]
+            (emphasisCombo [ "Gain", toString (gain * 100), "%" ] 1)
+        ]
+
+
+emphasisItem : Int -> ( Int, String ) -> Html Msg
+emphasisItem keyIdx item =
+    if Tuple.first item == keyIdx then
+        span [ class "value" ] [ text (Tuple.second item) ]
+    else
+        span [ class "description" ] [ text (Tuple.second item) ]
+
+
+emphasisCombo : List String -> Int -> List (Html Msg)
+emphasisCombo texts emphIdx =
+    List.map (emphasisItem emphIdx) (List.indexedMap (,) texts)
+
+
+
+-- stats : Model -> Html Msg
+-- stats model =
+--     div []
+--         [ text (toString model.cloudCount ++ " points") ]
+--
+--
+-- calc_cx : Int -> Int -> Point -> String
+-- calc_cx min_ max_ point =
+--     toString
+--         (toFloat
+--             (point.time - min_)
+--             / toFloat (max_ - min_)
+--             * 1000
+--         )
+--
+--
+-- calc_cy : Int -> Int -> Point -> String
+-- calc_cy min_ max_ point =
+--     toString
+--         (400
+--             - toFloat
+--                 (point.frequency - min_)
+--             / toFloat (max_ - min_)
+--             * 400
+--         )
+--
+--
+-- cloudDrawing : Model -> Html Msg
+-- cloudDrawing model =
+--     Svg.svg [ style "width: 1000px; height: 400px" ]
+--         (List.map
+--             (\note ->
+--                 Svg.circle
+--                     [ cx
+--                         (calc_cx
+--                             model.ranges.minTime
+--                             model.ranges.maxTime
+--                             note
+--                         )
+--                     , cy
+--                         (calc_cy
+--                             model.ranges.minFreq
+--                             model.ranges.maxFreq
+--                             note
+--                         )
+--                     , r "2"
+--                     ]
+--                     []
+--             )
+--             model.cloud
+--         )

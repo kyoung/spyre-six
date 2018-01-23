@@ -1,14 +1,15 @@
 module Main exposing (..)
 
 import Html exposing (program)
+import Ports exposing (gotCloud)
 import State exposing (init, update)
-import Types exposing (Model, Msg)
+import Types exposing (Model, Msg(..))
 import View exposing (root)
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    gotCloud GotCloud
 
 
 main : Program Never Model Msg
