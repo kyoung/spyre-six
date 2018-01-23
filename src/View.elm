@@ -53,7 +53,7 @@ cloudControls cloud =
 drawCloudSeed : CloudSeed -> Html Msg
 drawCloudSeed seed =
     div []
-        [ div [ class "informational" ] (emphasisCombo [ toString seed.count, "points" ] 0)
+        [ div [ class "informational" ] (emphasisCombo [ "Points", toString seed.count ] 1)
         , div [ class "informational" ] (emphasisCombo [ "Key", toString seed.key ] 1)
         , div [ class "informational" ]
             (emphasisCombo
@@ -63,6 +63,7 @@ drawCloudSeed seed =
                 1
             )
         , div [ class "informational" ] (emphasisCombo [ "Bars", toString seed.bars ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Tempo", toString seed.tempo ] 1)
         ]
 
 
@@ -117,57 +118,3 @@ emphasisItem keyIdx item =
 emphasisCombo : List String -> Int -> List (Html Msg)
 emphasisCombo texts emphIdx =
     List.map (emphasisItem emphIdx) (List.indexedMap (,) texts)
-
-
-
--- stats : Model -> Html Msg
--- stats model =
---     div []
---         [ text (toString model.cloudCount ++ " points") ]
---
---
--- calc_cx : Int -> Int -> Point -> String
--- calc_cx min_ max_ point =
---     toString
---         (toFloat
---             (point.time - min_)
---             / toFloat (max_ - min_)
---             * 1000
---         )
---
---
--- calc_cy : Int -> Int -> Point -> String
--- calc_cy min_ max_ point =
---     toString
---         (400
---             - toFloat
---                 (point.frequency - min_)
---             / toFloat (max_ - min_)
---             * 400
---         )
---
---
--- cloudDrawing : Model -> Html Msg
--- cloudDrawing model =
---     Svg.svg [ style "width: 1000px; height: 400px" ]
---         (List.map
---             (\note ->
---                 Svg.circle
---                     [ cx
---                         (calc_cx
---                             model.ranges.minTime
---                             model.ranges.maxTime
---                             note
---                         )
---                     , cy
---                         (calc_cy
---                             model.ranges.minFreq
---                             model.ranges.maxFreq
---                             note
---                         )
---                     , r "2"
---                     ]
---                     []
---             )
---             model.cloud
---         )

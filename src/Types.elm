@@ -60,6 +60,7 @@ type alias CloudSeed =
     , count : Int
     , ranges : Ranges
     , bars : Int
+    , tempo : Int
     , cloudId : Int
     }
 

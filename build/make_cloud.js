@@ -80,6 +80,7 @@ function makeCloud(cloudSeed) {
   , 'ranges': {'minNote', 'maxNote', 'minTimber', 'maxTimber'}
   , 'bars': Int
   , 'cloudId': Int
+  , 'tempo': Int
   }
 
   Generate a list of Points ({'frequency', 'timber', 'time', 'rhythm', 'velocity'})
@@ -98,7 +99,7 @@ function makeCloud(cloudSeed) {
       'frequency': noteToFreq(n*10),
       'note': n,
       'timber': randInt(cloudSeed.ranges.minTimber, cloudSeed.ranges.maxTimber),
-      'time': beatToTime(r, 120),
+      'time': beatToTime(r, cloudSeed.tempo),
       'rhythm': r,
       'velocity': beatToVelocity(r),
     }

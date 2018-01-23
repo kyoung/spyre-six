@@ -26,6 +26,7 @@ firstSeed =
     , ranges = { minNote = 210, maxNote = 1080, minTimber = 10, maxTimber = 5000 }
     , cloudId = 0
     , bars = 4
+    , tempo = 120
     }
 
 
