@@ -52,3 +52,7 @@ span.bubbleTitle {
 .description {
   color: #aaa;
 }
+
+.buttonTray {
+  display: Flex;
+}

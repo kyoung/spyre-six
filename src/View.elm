@@ -19,7 +19,7 @@ playBar : Bool -> List Int -> Html Msg
 playBar looping sequence =
     div [ class "bubble" ]
         [ span [ class "bubbleTitle" ] [ text "Playback" ]
-        , div []
+        , div [ class "buttonTray" ]
             [ button [ onClick PlayCloud ] [ text "Play" ]
             , button [] [ text "Loop" ]
             , drawSequence sequence
