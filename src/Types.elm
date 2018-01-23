@@ -3,6 +3,7 @@ module Types exposing (..)
 
 type alias Point =
     { frequency : Int
+    , note : Int
     , timber : Int
     , time : Int
     , rhythm : Int
@@ -54,7 +55,7 @@ type alias Register =
 
 
 type alias CloudSeed =
-    { key : Int
+    { key : String
     , tsig : TimeSignature
     , count : Int
     , ranges : Ranges

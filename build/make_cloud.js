@@ -1,5 +1,31 @@
+const majorKey = [ 0, 2, 4, 5, 7, 9, 11, 12 ];
+const keyMap = {
+    'Ab':20,
+    'A': 21,
+    'A#':22,
+    'Bb':22,
+    'B': 23,
+    'C': 24,
+    'C#':25,
+    'Db':25,
+    'D': 26,
+    'D#':27,
+    'Eb':27,
+    'E': 28,
+    'F': 29,
+    'F#':30,
+    'Gb':30,
+    'G': 31,
+    'G#':32
+}
+
 function randInt(min, max) {
   return Math.floor( Math.random() * ( max - min ) ) + min;
+}
+
+function randChoice(list) {
+  let r = Math.floor( Math.random() * list.length )
+  return list[r];
 }
 
 function noteToFreq(note) {
@@ -48,7 +74,7 @@ function beatToVelocity(beat) {
 function makeCloud(cloudSeed) {
   /*
   Given cloudSeed:
-  { 'key': Int
+  { 'key': String
   , 'tsig': {'noteValue': Int, 'beats': Int}
   , 'count': Int
   , 'ranges': {'minNote', 'maxNote', 'minTimber', 'maxTimber'}
@@ -59,12 +85,18 @@ function makeCloud(cloudSeed) {
   Generate a list of Points ({'frequency', 'timber', 'time', 'rhythm', 'velocity'})
   that satisfies the parameters of the seed.
   */
+  let scaleOffsets = majorKey.map(i => i + keyMap[cloudSeed.key])
+  let validNotes = [].concat.apply([], [1, 2, 3, 4, 5].map(i => {
+    return scaleOffsets.map(o => o + 12 * i);
+  } ) );
+
   return Array(cloudSeed.count).fill().map(() => {
     let maxRhythm = cloudSeed.bars * cloudSeed.tsig.beats * (16 / cloudSeed.tsig.noteValue);
     let r = randInt(0, maxRhythm);
-    let n = randInt(cloudSeed.ranges.minNote, cloudSeed.ranges.maxNote);
+    let n = randChoice(validNotes);
     return {
-      'frequency': noteToFreq(n),
+      'frequency': noteToFreq(n*10),
+      'note': n,
       'timber': randInt(cloudSeed.ranges.minTimber, cloudSeed.ranges.maxTimber),
       'time': beatToTime(r, 120),
       'rhythm': r,

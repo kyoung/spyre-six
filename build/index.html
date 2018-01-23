@@ -17,8 +17,8 @@
 
 
       app.ports.playCloud.subscribe( function(s) {
-        fullState = s;
-        playCloud( fullState );
+        fullState = JSON.parse(s);
+        playClouds( fullState );
       } )
 
       app.ports.makeCloud.subscribe( function(json_seed) {

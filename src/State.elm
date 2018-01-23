@@ -20,7 +20,7 @@ import Types
 
 firstSeed : CloudSeed
 firstSeed =
-    { key = 52
+    { key = "Ab"
     , tsig = { noteValue = 4, beats = 4 }
     , count = 100
     , ranges = { minNote = 210, maxNote = 1080, minTimber = 10, maxTimber = 5000 }
@@ -74,10 +74,22 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
     case action of
         GotCloud cloudResponse ->
-            ( model, Cmd.none )
+            ( setCloudPoints model cloudResponse.cloudId cloudResponse.points, Cmd.none )
 
         PlayCloud ->
             ( model, playCloud (encode 0 (modelToJSON model)) )
+
+
+setCloudPoints : Model -> Int -> List Point -> Model
+setCloudPoints model cloudId points =
+    let
+        updateCloud c =
+            if c.id == cloudId then
+                { c | points = points }
+            else
+                c
+    in
+    { model | clouds = List.map updateCloud model.clouds }
 
 
 

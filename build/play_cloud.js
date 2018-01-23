@@ -41,10 +41,25 @@ vcos.map(function(vco, i) {
 })
 
 
-async function playCloud( state ) {
+function playClouds( state ) {
+  var lastEnd = 0
+  state.sequence.forEach(function(cloudID) {
+    // assumes the clouds are in order
+    let cloud = state.clouds[cloudID];
+    let thisEnd = lastEnd;
+    setTimeout( function() {
+      playCloud(cloud)
+    }, thisEnd );
+    let maxTime = Math.max(...cloud.points.map( p => p.time))
+    lastEnd = thisEnd + maxTime
+  })
+}
+
+function playCloud( cloud ) {
+  console.log("playing cloud " + cloud.id)
 
   var start = Date.now();
-  var notes = state.cloud.sort( function (a, b) { return a.time - b.time  } )
+  var notes = cloud.points.sort( function (a, b) { return a.time - b.time  } )
 
   var percusiveNotes = notes.filter( function(note) { return note.timber < 62; } )
   var melodicNotes = notes.filter( function(note) { return note.timber >= 62 && note.timber < 500; } )
@@ -53,12 +68,6 @@ async function playCloud( state ) {
   playPercusion(percusiveNotes);
   playMelodic(melodicNotes);
   playPads(padNotes);
-
-  if ( playLoop ) {
-    setTimeout( function() {
-      playCloud( state );
-    }, notes[notes.length -1 ].time )
-  }
 
 }
 
@@ -83,18 +92,14 @@ function playNotes(voicePool, notes) {
   }
 }
 
-async function playPercusion( notes ) {
+function playPercusion( notes ) {
   playNotes([0, 1, 2, 3], notes);
 }
 
-async function playMelodic( notes ) {
+function playMelodic( notes ) {
   playNotes([4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], notes)
 }
 
-async function playPads( notes ) {
+function playPads( notes ) {
   playNotes([16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31], notes)
-}
-
-function sleep (ms) {
-  return new Promise( resolve => setTimeout(resolve, ms));
 }

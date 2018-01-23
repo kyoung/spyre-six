@@ -27,6 +27,7 @@ pointToJSON : Point -> Value
 pointToJSON point =
     object
         [ ( "frequency", int point.frequency )
+        , ( "note", int point.note )
         , ( "timber", int point.timber )
         , ( "time", int point.time )
         , ( "rhythm", int point.rhythm )
@@ -66,7 +67,7 @@ adsrToJSON adsr =
 cloudSeedToJSON : CloudSeed -> Value
 cloudSeedToJSON seed =
     object
-        [ ( "key", int seed.key )
+        [ ( "key", string seed.key )
         , ( "tsig", tsigToJSON seed.tsig )
         , ( "count", int seed.count )
         , ( "ranges", rangesToJSON seed.ranges )
