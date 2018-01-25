@@ -87,3 +87,4 @@ type alias Model =
 type Msg
     = GotCloud CloudResponse
     | PlayCloud
+    | AddCloud

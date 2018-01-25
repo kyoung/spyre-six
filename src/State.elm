@@ -2,6 +2,7 @@ module State exposing (..)
 
 import Filters exposing (baseA, createMajorKeyFilter)
 import Json.Encode exposing (encode, object)
+import Maybe
 import Ports exposing (makeCloud, playCloud)
 import Random
 import ToJson exposing (cloudSeedToJSON, modelToJSON)
@@ -79,6 +80,38 @@ update action model =
 
         PlayCloud ->
             ( model, playCloud (encode 0 (modelToJSON model)) )
+
+        AddCloud ->
+            let
+                maxCloudId =
+                    Maybe.withDefault
+                        0
+                        (List.maximum
+                            (List.map (\c -> c.id) model.clouds)
+                        )
+
+                newId =
+                    maxCloudId + 1
+            in
+            ( addCloud model newId
+            , makeCloud (encode 0 (cloudSeedToJSON { firstSeed | cloudId = newId }))
+            )
+
+
+addCloud : Model -> Int -> Model
+addCloud model cid =
+    let
+        updatedClouds clouds =
+            List.append
+                clouds
+                [ { seed = firstSeed
+                  , points = []
+                  , registers = [ firstRegister ]
+                  , id = cid
+                  }
+                ]
+    in
+    { model | clouds = updatedClouds model.clouds }
 
 
 setCloudPoints : Model -> Int -> List Point -> Model

@@ -13,6 +13,13 @@ body {
   margin: 20px;
 }
 
+.addCloud.bubble {
+  border: 1px solid #aaa;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
 span.bubbleTitle {
   position: relative;
   top: -10px;

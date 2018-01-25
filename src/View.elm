@@ -3,7 +3,17 @@ module View exposing (..)
 import Html exposing (Html, button, div, h2, hr, p, span, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Types exposing (ADSR, Cloud, CloudSeed, Model, Msg(..), Register, Voice, Wave)
+import Types
+    exposing
+        ( ADSR
+        , Cloud
+        , CloudSeed
+        , Model
+        , Msg(..)
+        , Register
+        , Voice
+        , Wave
+        )
 
 
 root : Model -> Html Msg
@@ -38,7 +48,16 @@ drawSequence sequence =
 cloudsDisplay : Model -> Html Msg
 cloudsDisplay model =
     div [ class "clouds" ]
-        (List.map cloudControls model.clouds)
+        (List.append
+            (List.map cloudControls model.clouds)
+            [ addCloud ]
+        )
+
+
+addCloud : Html Msg
+addCloud =
+    div [ class "addCloud", class "bubble", onClick AddCloud ]
+        [ text "add Cloud" ]
 
 
 cloudControls : Cloud -> Html Msg
