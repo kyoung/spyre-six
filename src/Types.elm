@@ -81,6 +81,7 @@ type alias Model =
     { clouds : List Cloud
     , sequence : List Int
     , loop : Bool
+    , editSequence : Bool
     }
 
 
@@ -89,3 +90,5 @@ type Msg
     | PlayCloud
     | AddCloud
     | DeleteCloud Int
+    | EditSequence
+    | SaveSequence String

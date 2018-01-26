@@ -1,8 +1,8 @@
 module View exposing (..)
 
-import Html exposing (Html, button, div, h2, hr, p, span, text)
+import Html exposing (Html, button, div, h2, hr, input, p, span, text)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Types
     exposing
         ( ADSR
@@ -20,29 +20,40 @@ root : Model -> Html Msg
 root model =
     div []
         [ h2 [ class "spyre" ] [ text "Spyre Six" ]
-        , playBar model.loop model.sequence
+        , playBar model.loop model.editSequence model.sequence
         , cloudsDisplay model
         ]
 
 
-playBar : Bool -> List Int -> Html Msg
-playBar looping sequence =
+playBar : Bool -> Bool -> List Int -> Html Msg
+playBar looping in_edit sequence =
     div [ class "bubble" ]
         [ span [ class "bubbleTitle" ] [ text "Playback" ]
         , div [ class "buttonTray" ]
             [ button [ onClick PlayCloud ] [ text "Play" ]
-            , button [] [ text "Loop" ]
-            , drawSequence sequence
+            , button [ class "buttonPad" ] [ text "Loop" ]
+            , drawSequence sequence in_edit
             ]
         ]
 
 
-drawSequence : List Int -> Html Msg
-drawSequence sequence =
-    if List.length sequence > 1 then
-        span [ class "informational" ] (emphasisCombo [ "Sequence", List.foldr (++) "" (List.map toString sequence) ] 1)
+drawSequence : List Int -> Bool -> Html Msg
+drawSequence sequence in_edit =
+    if in_edit then
+        span [ class "informational" ]
+            [ span [ class "description" ] [ text "Sequence" ]
+            , input [ placeholder (List.foldr (++) "" (List.map toString sequence)), onInput SaveSequence ] []
+            , span [ class "seqEdit", onClick EditSequence ] [ text "/" ]
+            ]
     else
-        span [] []
+        span [ class "informational" ]
+            (List.append
+                (emphasisCombo
+                    [ "Sequence", List.foldr (++) "" (List.map toString sequence) ]
+                    1
+                )
+                [ span [ class "seqEdit", onClick EditSequence ] [ text "/" ] ]
+            )
 
 
 cloudsDisplay : Model -> Html Msg
@@ -65,6 +76,7 @@ cloudControls cloud =
     div [ class "bubble", class "cloudControl" ]
         [ span [ class "bubbleTitle" ] [ text ("Cloud " ++ toString cloud.id) ]
         , div [ class "delCloud", onClick (DeleteCloud cloud.id) ] [ text "x" ]
+        , div [ class "editCloud" ] [ text "/" ]
         , drawCloudSeed cloud.seed
         , div [ class "registers" ] (List.map drawRegister cloud.registers)
         ]

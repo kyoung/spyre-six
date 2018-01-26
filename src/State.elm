@@ -67,6 +67,7 @@ init =
             ]
       , sequence = []
       , loop = True
+      , editSequence = False
       }
     , makeCloud (encode 0 (cloudSeedToJSON firstSeed))
     )
@@ -99,6 +100,19 @@ update action model =
 
         DeleteCloud cloudId ->
             ( deleteCloud model cloudId, Cmd.none )
+
+        EditSequence ->
+            ( { model | editSequence = not model.editSequence }, Cmd.none )
+
+        SaveSequence new_sequence ->
+            ( { model
+                | sequence =
+                    List.map
+                        (\s -> Result.withDefault 0 (String.toInt s))
+                        (String.split "" new_sequence)
+              }
+            , Cmd.none
+            )
 
 
 deleteCloud : Model -> Int -> Model
