@@ -114,6 +114,9 @@ update action model =
             , Cmd.none
             )
 
+        Loop ->
+            ( { model | loop = not model.loop }, Cmd.none )
+
 
 deleteCloud : Model -> Int -> Model
 deleteCloud model cid =

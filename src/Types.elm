@@ -92,3 +92,4 @@ type Msg
     | DeleteCloud Int
     | EditSequence
     | SaveSequence String
+    | Loop

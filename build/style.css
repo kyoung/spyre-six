@@ -94,3 +94,7 @@ span.bubbleTitle {
 .buttonPad {
   margin: 0 10px 0 10px;
 }
+
+.looping {
+  background-color: blue;
+}

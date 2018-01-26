@@ -27,11 +27,18 @@ root model =
 
 playBar : Bool -> Bool -> List Int -> Html Msg
 playBar looping in_edit sequence =
+    let
+        loopText =
+            if looping then
+                "Stop"
+            else
+                "Loop"
+    in
     div [ class "bubble" ]
         [ span [ class "bubbleTitle" ] [ text "Playback" ]
         , div [ class "buttonTray" ]
             [ button [ onClick PlayCloud ] [ text "Play" ]
-            , button [ class "buttonPad" ] [ text "Loop" ]
+            , button [ class "buttonPad", onClick Loop ] [ text loopText ]
             , drawSequence sequence in_edit
             ]
         ]
