@@ -68,6 +68,7 @@ init =
       , sequence = []
       , loop = True
       , editSequence = False
+      , editCloud = -1
       }
     , makeCloud (encode 0 (cloudSeedToJSON firstSeed))
     )
@@ -101,6 +102,16 @@ update action model =
         DeleteCloud cloudId ->
             ( deleteCloud model cloudId, Cmd.none )
 
+        EditCloud cloudId ->
+            let
+                new_edit_id =
+                    if model.editCloud == cloudId then
+                        -1
+                    else
+                        cloudId
+            in
+            ( { model | editCloud = new_edit_id }, Cmd.none )
+
         EditSequence ->
             ( { model | editSequence = not model.editSequence }, Cmd.none )
 
@@ -114,8 +125,30 @@ update action model =
             , Cmd.none
             )
 
+        EditPoints cloudId pointCount ->
+            ( updateCloudPointCount model cloudId pointCount, Cmd.none )
+
         Loop ->
             ( { model | loop = not model.loop }, Cmd.none )
+
+
+updateCloudPointCount : Model -> Int -> String -> Model
+updateCloudPointCount model cloudId newPoints =
+    let
+        updateSeed seed =
+            { seed | count = Result.withDefault 0 (String.toInt newPoints) }
+
+        updateClouds clouds =
+            List.map
+                (\c ->
+                    if c.id == cloudId then
+                        { c | seed = updateSeed c.seed }
+                    else
+                        c
+                )
+                clouds
+    in
+    { model | clouds = updateClouds model.clouds }
 
 
 deleteCloud : Model -> Int -> Model
@@ -132,7 +165,7 @@ addCloud model cid =
         updatedClouds clouds =
             List.append
                 clouds
-                [ { seed = firstSeed
+                [ { seed = { firstSeed | cloudId = cid }
                   , points = []
                   , registers = [ firstRegister ]
                   , id = cid

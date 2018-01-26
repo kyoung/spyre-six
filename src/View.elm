@@ -30,7 +30,7 @@ playBar looping in_edit sequence =
     let
         loopText =
             if looping then
-                "Stop"
+                "Break Loop"
             else
                 "Loop"
     in
@@ -67,7 +67,7 @@ cloudsDisplay : Model -> Html Msg
 cloudsDisplay model =
     div [ class "clouds" ]
         (List.append
-            (List.map cloudControls model.clouds)
+            (List.map (cloudControls model.editCloud) model.clouds)
             [ addCloud ]
         )
 
@@ -78,14 +78,27 @@ addCloud =
         [ text "add Cloud" ]
 
 
-cloudControls : Cloud -> Html Msg
-cloudControls cloud =
+cloudControls : Int -> Cloud -> Html Msg
+cloudControls editCloud cloud =
     div [ class "bubble", class "cloudControl" ]
         [ span [ class "bubbleTitle" ] [ text ("Cloud " ++ toString cloud.id) ]
         , div [ class "delCloud", onClick (DeleteCloud cloud.id) ] [ text "x" ]
-        , div [ class "editCloud" ] [ text "/" ]
-        , drawCloudSeed cloud.seed
+        , div [ class "editCloud", onClick (EditCloud cloud.id) ] [ text "/" ]
+        , if cloud.id == editCloud then
+            drawEditCloudSeed cloud.seed
+          else
+            drawCloudSeed cloud.seed
         , div [ class "registers" ] (List.map drawRegister cloud.registers)
+        ]
+
+
+drawEditCloudSeed : CloudSeed -> Html Msg
+drawEditCloudSeed seed =
+    div []
+        [ div [ class "informational" ]
+            [ span [] [ text "Points" ]
+            , input [ placeholder (toString seed.count), onInput (EditPoints seed.cloudId) ] []
+            ]
         ]
 
 

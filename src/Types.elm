@@ -82,6 +82,7 @@ type alias Model =
     , sequence : List Int
     , loop : Bool
     , editSequence : Bool
+    , editCloud : Int
     }
 
 
@@ -92,4 +93,6 @@ type Msg
     | DeleteCloud Int
     | EditSequence
     | SaveSequence String
+    | EditCloud Int
+    | EditPoints Int String
     | Loop
