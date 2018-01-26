@@ -65,7 +65,7 @@ init =
               , id = 0
               }
             ]
-      , sequence = [ 0, 0 ]
+      , sequence = []
       , loop = True
       }
     , makeCloud (encode 0 (cloudSeedToJSON firstSeed))
@@ -97,6 +97,17 @@ update action model =
             , makeCloud (encode 0 (cloudSeedToJSON { firstSeed | cloudId = newId }))
             )
 
+        DeleteCloud cloudId ->
+            ( deleteCloud model cloudId, Cmd.none )
+
+
+deleteCloud : Model -> Int -> Model
+deleteCloud model cid =
+    { model
+        | sequence = List.filter (\s -> s /= cid) model.sequence
+        , clouds = List.filter (\c -> c.id /= cid) model.clouds
+    }
+
 
 addCloud : Model -> Int -> Model
 addCloud model cid =
@@ -123,7 +134,10 @@ setCloudPoints model cloudId points =
             else
                 c
     in
-    { model | clouds = List.map updateCloud model.clouds }
+    { model
+        | clouds = List.map updateCloud model.clouds
+        , sequence = List.append model.sequence [ cloudId ]
+    }
 
 
 

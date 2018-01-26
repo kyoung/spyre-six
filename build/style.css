@@ -27,6 +27,18 @@ span.bubbleTitle {
   background: white;
 }
 
+.cloudControl {
+  position: relative;
+}
+
+.delCloud {
+  position: absolute;
+  top: 0px;
+  right: 5px;
+  color: #aaa;
+  cursor: pointer;
+}
+
 .clouds {
   display: flex;
   flex-direction: horizontal;

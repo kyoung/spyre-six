@@ -88,3 +88,4 @@ type Msg
     = GotCloud CloudResponse
     | PlayCloud
     | AddCloud
+    | DeleteCloud Int

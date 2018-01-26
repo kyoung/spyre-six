@@ -64,6 +64,7 @@ cloudControls : Cloud -> Html Msg
 cloudControls cloud =
     div [ class "bubble", class "cloudControl" ]
         [ span [ class "bubbleTitle" ] [ text ("Cloud " ++ toString cloud.id) ]
+        , div [ class "delCloud", onClick (DeleteCloud cloud.id) ] [ text "x" ]
         , drawCloudSeed cloud.seed
         , div [ class "registers" ] (List.map drawRegister cloud.registers)
         ]
