@@ -95,4 +95,6 @@ type Msg
     | SaveSequence String
     | EditCloud Int
     | EditPoints Int String
+    | EditKey Int String
+    | EditTsig Int String
     | Loop

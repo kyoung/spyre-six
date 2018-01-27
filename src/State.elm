@@ -126,7 +126,76 @@ update action model =
             )
 
         EditPoints cloudId pointCount ->
-            ( updateCloudPointCount model cloudId pointCount, Cmd.none )
+            let
+                newModel =
+                    updateCloudPointCount model cloudId pointCount
+
+                newSeed =
+                    (Maybe.withDefault { seed = firstSeed, id = 0, points = [], registers = [] }
+                        (List.head (List.filter (\c -> c.id == cloudId) newModel.clouds))
+                    ).seed
+            in
+            ( newModel
+            , makeCloud (encode 0 (cloudSeedToJSON newSeed))
+            )
+
+        EditKey cloudId newKey ->
+            let
+                updateSeed seed =
+                    { seed | key = newKey }
+
+                newModel =
+                    { model
+                        | clouds =
+                            List.map
+                                (\c ->
+                                    if c.id == cloudId then
+                                        { c | seed = updateSeed c.seed }
+                                    else
+                                        c
+                                )
+                                model.clouds
+                    }
+
+                newSeed =
+                    (Maybe.withDefault { seed = firstSeed, id = 0, points = [], registers = [] }
+                        (List.head (List.filter (\c -> c.id == cloudId) newModel.clouds))
+                    ).seed
+            in
+            ( newModel, makeCloud (encode 0 (cloudSeedToJSON newSeed)) )
+
+        EditTsig cloudId tsig ->
+            let
+                x =
+                    String.split "/" tsig
+
+                t =
+                    { beats = Result.withDefault 4 (String.toInt (Maybe.withDefault "4" (List.head x)))
+                    , noteValue = Result.withDefault 4 (String.toInt (Maybe.withDefault "4" (List.head (List.reverse x))))
+                    }
+
+                updateSeed seed =
+                    { seed | tsig = t }
+
+                newModel =
+                    { model
+                        | clouds =
+                            List.map
+                                (\c ->
+                                    if c.id == cloudId then
+                                        { c | seed = updateSeed c.seed }
+                                    else
+                                        c
+                                )
+                                model.clouds
+                    }
+
+                newSeed =
+                    (Maybe.withDefault { seed = firstSeed, id = 0, points = [], registers = [] }
+                        (List.head (List.filter (\c -> c.id == cloudId) newModel.clouds))
+                    ).seed
+            in
+            ( newModel, makeCloud (encode 0 (cloudSeedToJSON newSeed)) )
 
         Loop ->
             ( { model | loop = not model.loop }, Cmd.none )
@@ -184,107 +253,4 @@ setCloudPoints model cloudId points =
             else
                 c
     in
-    { model
-        | clouds = List.map updateCloud model.clouds
-        , sequence = List.append model.sequence [ cloudId ]
-    }
-
-
-
---
---
--- applyFilters : List FreqFilter -> List Point -> List Point
--- applyFilters filters cloud =
---     List.foldl applyFilter cloud filters
---
---
--- applyFilter : FreqFilter -> List Point -> List Point
--- applyFilter filter_ cloud =
---     List.filter (\p -> List.member p.frequency filter_.frequencies) cloud
---
---
--- addFreqs : List Point -> List Int -> List Point
--- addFreqs cloud freqs =
---     List.map2 addFreq cloud freqs
---
---
--- addFreq : Point -> Int -> Point
--- addFreq point freq =
---     { point | frequency = freq }
---
---
--- noteToFreq : Int -> Int
--- noteToFreq midiNote =
---     round (2 ^ ((toFloat midiNote - 690) / 120) * 440)
---
---
--- beatToTime : Int -> Int
--- beatToTime beatVal =
---     -- assume a 4/4, 120bpm
---     -- each beat maps to a 16th note in that range...
---     let
---         -- quarter notes
---         bpm =
---             120.0
---
---         -- 16th notes, AKA bpm multiplier
---         bpmModifier =
---             4.0
---     in
---     round (toFloat beatVal / (bpm / 60.0 / 1000.0 * bpmModifier))
---
---
--- beatToVelocity : Int -> Int
--- beatToVelocity beatVal =
---     -- assume a 4/4, 120bpm
---     -- 100 at each note, ie when beatVal modulo 16 == 0
---     -- 50 at each beat, ie when beatVal modulo 4 == 0
---     -- 30 at each demi, ie when beatVal modulo 2 == 0
---     -- 10 else
---     if beatVal % 16 == 0 then
---         100
---     else if beatVal % 4 == 0 then
---         50
---     else if beatVal % 2 == 0 then
---         30
---     else
---         10
---
---
--- tampPads : Point -> Point
--- tampPads point =
---     -- the pad points need to be muted a bit...
---     -- >500ms == pad
---     if point.timber > 500 then
---         { point | velocity = 30 }
---     else
---         point
---
---
--- addTimbers : List Point -> List Int -> List Point
--- addTimbers cloud timbers =
---     List.map2 addTimber cloud timbers
---
---
--- addTimber : Point -> Int -> Point
--- addTimber point timber =
---     { point | timber = timber }
---
---
--- addTimes : List Point -> List Int -> List Point
--- addTimes cloud times =
---     List.map2 addTime cloud times
---
---
--- addTime : Point -> Int -> Point
--- addTime point time =
---     { point | time = time }
---
---
--- addRhythms : List Point -> List Int -> List Point
--- addRhythms cloud rhythms =
---     List.map2 addRhythm cloud rhythms
---
---
--- addRhythm point rhythm =
---     { point | rhythm = rhythm, time = beatToTime rhythm, velocity = beatToVelocity rhythm }
+    { model | clouds = List.map updateCloud model.clouds }

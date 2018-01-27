@@ -1,8 +1,9 @@
 module View exposing (..)
 
-import Html exposing (Html, button, div, h2, hr, input, p, span, text)
+import Html exposing (Html, button, div, h2, hr, input, option, p, select, span, text)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (on, onClick, onInput)
+import Json.Decode as Json
 import Types
     exposing
         ( ADSR
@@ -14,6 +15,11 @@ import Types
         , Voice
         , Wave
         )
+
+
+onChange : (String -> msg) -> Html.Attribute msg
+onChange handler =
+    on "change" <| Json.map handler <| Json.at [ "target", "value" ] Json.string
 
 
 root : Model -> Html Msg
@@ -96,8 +102,45 @@ drawEditCloudSeed : CloudSeed -> Html Msg
 drawEditCloudSeed seed =
     div []
         [ div [ class "informational" ]
-            [ span [] [ text "Points" ]
-            , input [ placeholder (toString seed.count), onInput (EditPoints seed.cloudId) ] []
+            [ div []
+                [ span [] [ text "Points" ]
+                , input [ placeholder (toString seed.count), onInput (EditPoints seed.cloudId) ] []
+                ]
+            , div []
+                [ span [] [ text "Key" ]
+                , select [ onChange (EditKey seed.cloudId) ]
+                    [ option [ value "Ab" ] [ text "Ab" ]
+                    , option [ value "A" ] [ text "A" ]
+                    , option [ value "A#" ] [ text "A#" ]
+                    , option [ value "Bb" ] [ text "Bb" ]
+                    , option [ value "B" ] [ text "B" ]
+                    , option [ value "C" ] [ text "C" ]
+                    , option [ value "C#" ] [ text "C#" ]
+                    , option [ value "Db" ] [ text "Db" ]
+                    , option [ value "D" ] [ text "D" ]
+                    , option [ value "D#" ] [ text "D#" ]
+                    , option [ value "Eb" ] [ text "Eb" ]
+                    , option [ value "E" ] [ text "E" ]
+                    , option [ value "F" ] [ text "F" ]
+                    , option [ value "F#" ] [ text "F#" ]
+                    , option [ value "Gb" ] [ text "Gb" ]
+                    , option [ value "G" ] [ text "G" ]
+                    , option [ value "G#" ] [ text "G#" ]
+                    ]
+                ]
+            , div []
+                [ span [] [ text "Time Signature" ]
+                , input
+                    [ placeholder
+                        (toString seed.tsig.beats ++ "/" ++ toString seed.tsig.noteValue)
+                    , onInput (EditTsig seed.cloudId)
+                    ]
+                    []
+                ]
+            , div []
+                [ span [] [ text "Bars" ] ]
+            , div []
+                [ span [] [ text "Tempo" ] ]
             ]
         ]
 
