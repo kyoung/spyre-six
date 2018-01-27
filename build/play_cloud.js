@@ -53,6 +53,11 @@ function playClouds( state ) {
     let maxTime = Math.max(...cloud.points.map( p => p.time))
     lastEnd = thisEnd + maxTime
   })
+  if (playLoop) {
+    setTimeout( function () {
+      playClouds(fullState)
+    }, lastEnd)
+  }
 }
 
 function playCloud( cloud ) {

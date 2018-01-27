@@ -98,3 +98,12 @@ span.bubbleTitle {
 .looping {
   background-color: blue;
 }
+
+.editSpread {
+  display: flex;
+  justify-content: space-between;
+}
+
+.editSpread > input {
+  width: 50px;
+}

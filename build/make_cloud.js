@@ -1,4 +1,10 @@
+
 const majorKey = [ 0, 2, 4, 5, 7, 9, 11, 12 ];
+const scaleMap = {
+  'major': [ 0, 2, 4, 5, 7, 9, 11, 12 ],
+  'minor': [ 0, 2, 3, 5, 7, 8, 10, 12 ],
+  'jazz minor': [ 0, 2, 3, 5, 7, 9, 11, 12 ]
+}
 const keyMap = {
     'Ab':20,
     'A': 21,
@@ -81,12 +87,14 @@ function makeCloud(cloudSeed) {
   , 'bars': Int
   , 'cloudId': Int
   , 'tempo': Int
+  , 'scale': String
   }
 
   Generate a list of Points ({'frequency', 'timber', 'time', 'rhythm', 'velocity'})
   that satisfies the parameters of the seed.
   */
-  let scaleOffsets = majorKey.map(i => i + keyMap[cloudSeed.key])
+  let scale = scaleMap[cloudSeed.scale];
+  let scaleOffsets = scale.map(i => i + keyMap[cloudSeed.key])
   let validNotes = [].concat.apply([], [1, 2, 3, 4, 5].map(i => {
     return scaleOffsets.map(o => o + 12 * i);
   } ) );

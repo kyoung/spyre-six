@@ -62,6 +62,7 @@ type alias CloudSeed =
     , bars : Int
     , tempo : Int
     , cloudId : Int
+    , scale : String
     }
 
 
@@ -97,4 +98,7 @@ type Msg
     | EditPoints Int String
     | EditKey Int String
     | EditTsig Int String
+    | EditBars Int String
+    | EditTempo Int String
+    | EditScale Int String
     | Loop

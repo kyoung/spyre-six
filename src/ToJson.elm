@@ -74,6 +74,7 @@ cloudSeedToJSON seed =
         , ( "bars", int seed.bars )
         , ( "cloudId", int seed.cloudId )
         , ( "tempo", int seed.tempo )
+        , ( "scale", string seed.scale )
         ]
 
 

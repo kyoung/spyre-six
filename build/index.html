@@ -18,6 +18,7 @@
 
       app.ports.playCloud.subscribe( function(s) {
         fullState = JSON.parse(s);
+        playLoop = fullState.loop;
         playClouds( fullState );
       } )
 

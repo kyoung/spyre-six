@@ -102,11 +102,11 @@ drawEditCloudSeed : CloudSeed -> Html Msg
 drawEditCloudSeed seed =
     div []
         [ div [ class "informational" ]
-            [ div []
+            [ div [ class "editSpread" ]
                 [ span [] [ text "Points" ]
                 , input [ placeholder (toString seed.count), onInput (EditPoints seed.cloudId) ] []
                 ]
-            , div []
+            , div [ class "editSpread" ]
                 [ span [] [ text "Key" ]
                 , select [ onChange (EditKey seed.cloudId) ]
                     [ option [ value "Ab" ] [ text "Ab" ]
@@ -128,7 +128,7 @@ drawEditCloudSeed seed =
                     , option [ value "G#" ] [ text "G#" ]
                     ]
                 ]
-            , div []
+            , div [ class "editSpread" ]
                 [ span [] [ text "Time Signature" ]
                 , input
                     [ placeholder
@@ -137,10 +137,32 @@ drawEditCloudSeed seed =
                     ]
                     []
                 ]
-            , div []
-                [ span [] [ text "Bars" ] ]
-            , div []
-                [ span [] [ text "Tempo" ] ]
+            , div [ class "editSpread" ]
+                [ span [] [ text "Bars" ]
+                , input
+                    [ placeholder
+                        (toString seed.bars)
+                    , onInput (EditBars seed.cloudId)
+                    ]
+                    []
+                ]
+            , div [ class "editSpread" ]
+                [ span [] [ text "Tempo" ]
+                , input
+                    [ placeholder
+                        (toString seed.tempo)
+                    , onInput (EditTempo seed.cloudId)
+                    ]
+                    []
+                ]
+            , div [ class "editSpread" ]
+                [ span [] [ text "Scale" ]
+                , select [ onChange (EditScale seed.cloudId) ]
+                    [ option [ value "major" ] [ text "major" ]
+                    , option [ value "minor" ] [ text "minor" ]
+                    , option [ value "jazz minor" ] [ text "jazz minor" ]
+                    ]
+                ]
             ]
         ]
 
@@ -159,6 +181,7 @@ drawCloudSeed seed =
             )
         , div [ class "informational" ] (emphasisCombo [ "Bars", toString seed.bars ] 1)
         , div [ class "informational" ] (emphasisCombo [ "Tempo", toString seed.tempo ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Scale", toString seed.scale ] 1)
         ]
 
 

@@ -23,11 +23,12 @@ firstSeed : CloudSeed
 firstSeed =
     { key = "Ab"
     , tsig = { noteValue = 4, beats = 4 }
-    , count = 100
+    , count = 20
     , ranges = { minNote = 210, maxNote = 1080, minTimber = 10, maxTimber = 5000 }
     , cloudId = 0
     , bars = 4
     , tempo = 120
+    , scale = "major"
     }
 
 
@@ -65,7 +66,7 @@ init =
               , id = 0
               }
             ]
-      , sequence = []
+      , sequence = [ 0 ]
       , loop = True
       , editSequence = False
       , editCloud = -1
@@ -127,40 +128,75 @@ update action model =
 
         EditPoints cloudId pointCount ->
             let
-                newModel =
-                    updateCloudPointCount model cloudId pointCount
+                pc =
+                    Result.withDefault 100 (String.toInt pointCount)
+
+                oldSeed =
+                    getCloudSeed model cloudId
 
                 newSeed =
-                    (Maybe.withDefault { seed = firstSeed, id = 0, points = [], registers = [] }
-                        (List.head (List.filter (\c -> c.id == cloudId) newModel.clouds))
-                    ).seed
+                    { oldSeed | count = pc }
+
+                newModel =
+                    updateSeed model newSeed cloudId
             in
-            ( newModel
-            , makeCloud (encode 0 (cloudSeedToJSON newSeed))
-            )
+            ( newModel, makeCloud (encode 0 (cloudSeedToJSON newSeed)) )
 
         EditKey cloudId newKey ->
             let
-                updateSeed seed =
-                    { seed | key = newKey }
-
-                newModel =
-                    { model
-                        | clouds =
-                            List.map
-                                (\c ->
-                                    if c.id == cloudId then
-                                        { c | seed = updateSeed c.seed }
-                                    else
-                                        c
-                                )
-                                model.clouds
-                    }
+                oldSeed =
+                    getCloudSeed model cloudId
 
                 newSeed =
-                    (Maybe.withDefault { seed = firstSeed, id = 0, points = [], registers = [] }
-                        (List.head (List.filter (\c -> c.id == cloudId) newModel.clouds))
-                    ).seed
+                    { oldSeed | key = newKey }
+
+                newModel =
+                    updateSeed model newSeed cloudId
+            in
+            ( newModel, makeCloud (encode 0 (cloudSeedToJSON newSeed)) )
+
+        EditBars cloudId bars ->
+            let
+                b =
+                    Result.withDefault 4 (String.toInt bars)
+
+                oldSeed =
+                    getCloudSeed model cloudId
+
+                newSeed =
+                    { oldSeed | bars = b }
+
+                newModel =
+                    updateSeed model newSeed cloudId
+            in
+            ( newModel, makeCloud (encode 0 (cloudSeedToJSON newSeed)) )
+
+        EditTempo cloudId tempo ->
+            let
+                t =
+                    Result.withDefault 120 (String.toInt tempo)
+
+                oldSeed =
+                    getCloudSeed model cloudId
+
+                newSeed =
+                    { oldSeed | tempo = t }
+
+                newModel =
+                    updateSeed model newSeed cloudId
+            in
+            ( newModel, makeCloud (encode 0 (cloudSeedToJSON newSeed)) )
+
+        EditScale cloudId newScale ->
+            let
+                oldSeed =
+                    getCloudSeed model cloudId
+
+                newSeed =
+                    { oldSeed | scale = newScale }
+
+                newModel =
+                    updateSeed model newSeed cloudId
             in
             ( newModel, makeCloud (encode 0 (cloudSeedToJSON newSeed)) )
 
@@ -174,31 +210,45 @@ update action model =
                     , noteValue = Result.withDefault 4 (String.toInt (Maybe.withDefault "4" (List.head (List.reverse x))))
                     }
 
-                updateSeed seed =
-                    { seed | tsig = t }
-
-                newModel =
-                    { model
-                        | clouds =
-                            List.map
-                                (\c ->
-                                    if c.id == cloudId then
-                                        { c | seed = updateSeed c.seed }
-                                    else
-                                        c
-                                )
-                                model.clouds
-                    }
+                oldSeed =
+                    getCloudSeed model cloudId
 
                 newSeed =
-                    (Maybe.withDefault { seed = firstSeed, id = 0, points = [], registers = [] }
-                        (List.head (List.filter (\c -> c.id == cloudId) newModel.clouds))
-                    ).seed
+                    { oldSeed | tsig = t }
+
+                newModel =
+                    updateSeed model newSeed cloudId
             in
             ( newModel, makeCloud (encode 0 (cloudSeedToJSON newSeed)) )
 
         Loop ->
-            ( { model | loop = not model.loop }, Cmd.none )
+            ( { model | loop = not model.loop }, playCloud (encode 0 (modelToJSON model)) )
+
+
+updateSeed : Model -> CloudSeed -> Int -> Model
+updateSeed model newSeed cloudId =
+    { model
+        | clouds =
+            List.map
+                (\c ->
+                    if c.id == cloudId then
+                        { c | seed = newSeed }
+                    else
+                        c
+                )
+                model.clouds
+    }
+
+
+getCloudSeed : Model -> Int -> CloudSeed
+getCloudSeed model cloudId =
+    let
+        c =
+            Maybe.withDefault
+                { seed = firstSeed, id = -1, registers = [], points = [] }
+                (List.head (List.filter (\c -> c.id == cloudId) model.clouds))
+    in
+    c.seed
 
 
 updateCloudPointCount : Model -> Int -> String -> Model
