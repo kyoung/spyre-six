@@ -67,7 +67,7 @@ init =
               }
             ]
       , sequence = [ 0 ]
-      , loop = True
+      , loop = False
       , editSequence = False
       , editCloud = -1
       }
