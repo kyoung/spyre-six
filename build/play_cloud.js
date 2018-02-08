@@ -46,31 +46,49 @@ function playCloud( cloud ) {
 }
 
 
-function playNotesInRegister( register, notes ) {
+let testNotes = [
+    {velocity: 100, timber: 4000, time: 0, frequency: 440},
+    {velocity: 80, timber: 2000, time: 3000, frequency: 640},
+];
+let testRegister = {voices:[{waveform: 'Sine', adsr: {attack: 100, decay: 100, sustain: 0.5, release: 500}}]}
 
-  debugger;
+
+function playNote(frequency, waveform, velocity, adsr, duration) {
+  let o = ctx.createOscillator();
+  o.type = waveform;
+  o.frequency.value = frequency;
+  let a = ctx.createGain();
+  let n = ctx.currentTime;
+  let v = velocity / 100;
+
+  a.gain.setValueAtTime(0, n);
+
+  let peak = n + adsr.attack/1000;
+  let dip = n + (adsr.attack+adsr.decay)/1000;
+  let drop = n + (adsr.attack+adsr.decay+duration)/1000;
+  let end = n + (adsr.attack+adsr.decay+duration+adsr.release)/1000;
+
+  a.gain.linearRampToValueAtTime(v, peak);
+  a.gain.linearRampToValueAtTime(v * adsr.sustain, dip);
+  a.gain.setValueAtTime(v * adsr.sustain, drop);
+  a.gain.linearRampToValueAtTime(0, end);
+
+  o.start();
+  o.connect(a);
+  a.connect(ctx.destination);
+}
+
+
+function playNotesInRegister( register, notes ) {
 
   for ( var i = 0; i < notes.length; i++ ) {
     let note = notes[i];
     setTimeout( function() {
 
-      let n = Date.now();
+      let n = ctx.currentTime;
 
       let voices = register.voices.map( function( v ) {
-        let o = ctx.createOscillator();
-        o.type = v.waveform;
-        o.frequency.value = note.frequency;
-
-        let a = ctx.createGain();
-        a.gain.value = 0;
-        a.gain.linearRampToValueAtTime(note.velocity / 100, n+v.adsr.attack);
-        a.gain.linearRampToValueAtTime(note.velocity / 100 * v.sustain, n+v.adsr.attack+v.adsr.decay);
-        a.gain.setValueAtTime(note.velocity / 100 * v.sustain, n+note.timber);
-        a.gain.linearRampToValueAtTime(0, n+note.timer+v.adsr.release);
-
-        o.connect(a);
-        a.connect(ctx.destination);
-
+        playNote(note.frequency, v.waveform, note.velocity, v.adsr, note.timber)
       } );
 
     }, note.time)
