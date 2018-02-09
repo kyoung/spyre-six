@@ -76,6 +76,14 @@ function playNote(frequency, waveform, velocity, adsr, duration) {
   o.start();
   o.connect(a);
   a.connect(ctx.destination);
+
+  setTimeout( function() {
+      o.stop()
+      o.disconnect(a);
+      a.disconnect(ctx.destination);
+      a = null;
+      o = null;
+  }, Date.now() + ( end - n ) * 1000 + 1000 )
 }
 
 
