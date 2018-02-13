@@ -122,4 +122,5 @@ type Msg
     | EditBars Int String
     | EditTempo Int String
     | EditScale Int String
+    | EditFilter Int String String String
     | Loop

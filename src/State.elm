@@ -278,6 +278,9 @@ update action model =
             in
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
+        EditFilter cloudId register filterParam valString ->
+            ( model, Cmd.none )
+
         Loop ->
             ( { model | loop = not model.loop }, playCloud (encode 0 (modelToJSON model)) )
 

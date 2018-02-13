@@ -205,16 +205,6 @@ drawRegister register =
         ]
 
 
-drawFilter : Filter -> Html Msg
-drawFilter filter =
-    div []
-        [ div [ class "informational" ] (emphasisCombo [ "Frequency", toString filter.frequency ] 1)
-        , div [ class "informational" ] (emphasisCombo [ "Q", toString filter.q ] 1)
-        , div [ class "informational" ] (emphasisCombo [ "Gain", toString filter.gain ] 1)
-        , div [ class "informational" ] (emphasisCombo [ "Type", toString filter.filterType ] 1)
-        ]
-
-
 drawEditRegister : Int -> Register -> Html Msg
 drawEditRegister cloudID register =
     div [ class "bubble", class "register" ]
@@ -242,6 +232,60 @@ drawEditRegister cloudID register =
             , div [] []
             ]
         , div [ class "voiceBox" ] (List.indexedMap (drawEditVoice cloudID register.name) register.voices)
+        , drawEditFilter cloudID register.name register.filter
+        ]
+
+
+drawEditFilter : Int -> String -> Filter -> Html Msg
+drawEditFilter cloudID registerName filter =
+    div [ class "informational" ]
+        [ div [ class "editSpread" ]
+            [ span []
+                [ text "Frequency" ]
+            , input
+                [ placeholder (toString filter.frequency)
+                , onInput (EditFilter cloudID registerName "frequency")
+                ]
+                []
+            ]
+        , div [ class "editSpread" ]
+            [ span []
+                [ text "Q" ]
+            , input
+                [ placeholder (toString filter.q)
+                , onInput (EditFilter cloudID registerName "q")
+                ]
+                []
+            ]
+        , div [ class "editSpread" ]
+            [ span []
+                [ text "Gain" ]
+            , input
+                [ placeholder (toString filter.gain)
+                , onInput (EditFilter cloudID registerName "gain")
+                ]
+                []
+            ]
+        , div [ class "editSpread" ]
+            [ span []
+                [ text "Type" ]
+            , select [ onChange (EditFilter cloudID registerName "type") ]
+                [ option [ value "LowPass" ] [ text "LowPass" ]
+                , option [ value "HighPass" ] [ text "HighPass" ]
+                , option [ value "BandPass" ] [ text "BandPass" ]
+                , option [ value "Notch" ] [ text "Notch" ]
+                ]
+            ]
+        ]
+
+
+drawFilter : Filter -> Html Msg
+drawFilter filter =
+    div []
+        [ div [ class "informational" ] (emphasisCombo [ "Frequency", toString filter.frequency ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Q", toString filter.q ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Gain", toString filter.gain ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Type", toString filter.filterType ] 1)
         ]
 
 
