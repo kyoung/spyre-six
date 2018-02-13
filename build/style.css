@@ -82,7 +82,7 @@ span.bubbleTitle {
 }
 
 .buttonTray {
-  display: Flex;
+  display: flex;
   align-items: center;
 }
 

@@ -47,11 +47,27 @@ type alias Voice =
     }
 
 
+type FilterType
+    = LowPass
+    | HighPass
+    | BandPass
+    | Notch
+
+
+type alias Filter =
+    { frequency : Int
+    , q : Float
+    , gain : Float
+    , filterType : FilterType
+    }
+
+
 type alias Register =
     { voices : List Voice
     , lowerTimber : Int
     , upperTimber : Int
     , name : String
+    , filter : Filter
     }
 
 

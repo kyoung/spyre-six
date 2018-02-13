@@ -53,13 +53,14 @@ let testNotes = [
 let testRegister = {voices:[{waveform: 'Sine', adsr: {attack: 100, decay: 100, sustain: 0.5, release: 500}}]}
 
 
-function playNote(frequency, waveform, velocity, adsr, duration) {
+function playNote(frequency, waveform, velocity, adsr, gain, duration, filter) {
   let o = ctx.createOscillator();
   o.type = waveform;
   o.frequency.value = frequency;
   let a = ctx.createGain();
+  let f = ctx.createBiquadFilter();
   let n = ctx.currentTime;
-  let v = velocity / 100;
+  let v = velocity / 100 * gain;
 
   a.gain.setValueAtTime(0, n);
 
@@ -73,14 +74,21 @@ function playNote(frequency, waveform, velocity, adsr, duration) {
   a.gain.setValueAtTime(v * adsr.sustain, drop);
   a.gain.linearRampToValueAtTime(0, end);
 
+  f.frequency = filter.frequency;
+  f.q = filter.q;
+  f.gain = filter.gain;
+  f.type = filter.filterType;
+
   o.start();
-  o.connect(a);
+  o.connect(f);
+  f.connect(a);
   a.connect(ctx.destination);
 
   let timeToOff = ( end - n ) * 1000 + 1000;
   window.setTimeout( function() {
       o.stop()
-      o.disconnect(a);
+      o.disconnect(f);
+      f.disconnect(a);
       a.disconnect(ctx.destination);
       a = null;
       o = null;
@@ -97,7 +105,7 @@ function playNotesInRegister( register, notes ) {
       let n = ctx.currentTime;
 
       let voices = register.voices.map( function( v ) {
-        playNote(note.frequency, v.waveform, note.velocity, v.adsr, note.timber)
+        playNote(note.frequency, v.waveform, note.velocity, v.adsr, v.gain, note.timber, register.filter)
       } );
 
     }, note.time)

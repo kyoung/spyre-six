@@ -26,6 +26,7 @@ root : Model -> Html Msg
 root model =
     div []
         [ h2 [ class "spyre" ] [ text "Spyre Six" ]
+        , span [] [ text "github" ]
         , playBar model.loop model.editSequence model.sequence
         , cloudsDisplay model
         ]
@@ -98,6 +99,7 @@ cloudControls editCloud cloud =
             div [ class "editRegisters" ] (List.map (drawEditRegister cloud.id) cloud.registers)
           else
             div [ class "registers" ] (List.map drawRegister cloud.registers)
+        , div [] [ text "add register" ]
         ]
 
 
@@ -198,6 +200,7 @@ drawRegister register =
             , hr [] []
             ]
         , div [ class "voiceBox" ] (List.map drawVoice register.voices)
+        , div [ class "filterBox" ] [ text "filters go here" ]
         ]
 
 
@@ -244,7 +247,7 @@ drawEditVoice cloudId registerName voiceId voice =
                 ]
             ]
         , drawEditADSR cloudId registerName voiceId voice.adsr
-        , drawEditGain cloudId registerName voicdId voice.gain
+        , drawEditGain cloudId registerName voiceId voice.gain
         ]
 
 

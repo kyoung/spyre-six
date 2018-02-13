@@ -9,6 +9,8 @@ import ToJson exposing (cloudSeedToJSON, modelToJSON)
 import Types
     exposing
         ( CloudSeed
+        , Filter
+        , FilterType(..)
         , Model
         , Msg(..)
         , Point
@@ -36,7 +38,7 @@ firstVoice : Voice
 firstVoice =
     { waveform = Sine
     , adsr = { attack = 100, decay = 200, sustain = 0.7, release = 500 }
-    , gain = 1.0
+    , gain = 0.2
     }
 
 
@@ -44,7 +46,7 @@ secondVoice : Voice
 secondVoice =
     { waveform = Triangle
     , adsr = { attack = 100, decay = 200, sustain = 0.7, release = 500 }
-    , gain = 0.7
+    , gain = 0.2
     }
 
 
@@ -54,6 +56,7 @@ firstRegister =
     , lowerTimber = 10
     , upperTimber = 5000
     , name = "default"
+    , filter = { frequency = 0, q = 0, gain = 0, filterType = HighPass }
     }
 
 
@@ -279,8 +282,8 @@ update action model =
             ( { model | loop = not model.loop }, playCloud (encode 0 (modelToJSON model)) )
 
 
-updateCloud : Model -> Int -> String -> Int -> Float -> Model
-updateCloud model cloudId registerName voiceId gain =
+updateGain : Model -> Int -> String -> Int -> Float -> Model
+updateGain model cloudId registerName voiceId gain =
     let
         updateVoices idx voice =
             if idx == voiceId then

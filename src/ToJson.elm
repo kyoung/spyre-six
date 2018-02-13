@@ -42,6 +42,17 @@ registerToJSON register =
         , ( "lowerTimber", int register.lowerTimber )
         , ( "upperTimber", int register.upperTimber )
         , ( "name", string register.name )
+        , ( "filter", filterToJSON register.filter )
+        ]
+
+
+filterToJSON : Filter -> Value
+filterToJSON filter =
+    object
+        [ ( "frequency", int filter.frequency )
+        , ( "q", float filter.q )
+        , ( "gain", float filter.gain )
+        , ( "filterType", string (toString filter.filterType) )
         ]
 
 
