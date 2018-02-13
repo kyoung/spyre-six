@@ -9,14 +9,14 @@ function playClouds( state ) {
     // assumes the clouds are in order
     let cloud = state.clouds[cloudID];
     let thisEnd = lastEnd;
-    setTimeout( function() {
+    window.setTimeout( function() {
       playCloud(cloud)
     }, thisEnd );
     let maxTime = Math.max(...cloud.points.map( p => p.time))
     lastEnd = thisEnd + maxTime
   })
   if (playLoop) {
-    setTimeout( function () {
+    window.setTimeout( function () {
       playClouds(fullState)
     }, lastEnd)
   }
@@ -77,13 +77,14 @@ function playNote(frequency, waveform, velocity, adsr, duration) {
   o.connect(a);
   a.connect(ctx.destination);
 
-  setTimeout( function() {
+  let timeToOff = ( end - n ) * 1000 + 1000;
+  window.setTimeout( function() {
       o.stop()
       o.disconnect(a);
       a.disconnect(ctx.destination);
       a = null;
       o = null;
-  }, Date.now() + ( end - n ) * 1000 + 1000 )
+  },  timeToOff )
 }
 
 
