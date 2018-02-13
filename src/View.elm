@@ -9,6 +9,7 @@ import Types
         ( ADSR
         , Cloud
         , CloudSeed
+        , Filter
         , Model
         , Msg(..)
         , Register
@@ -200,7 +201,17 @@ drawRegister register =
             , hr [] []
             ]
         , div [ class "voiceBox" ] (List.map drawVoice register.voices)
-        , div [ class "filterBox" ] [ text "filters go here" ]
+        , drawFilter register.filter
+        ]
+
+
+drawFilter : Filter -> Html Msg
+drawFilter filter =
+    div []
+        [ div [ class "informational" ] (emphasisCombo [ "Frequency", toString filter.frequency ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Q", toString filter.q ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Gain", toString filter.gain ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Type", toString filter.filterType ] 1)
         ]
 
 
