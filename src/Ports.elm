@@ -9,4 +9,7 @@ port playCloud : String -> Cmd msg
 port makeCloud : String -> Cmd msg
 
 
+port updateCloud : String -> Cmd msg
+
+
 port gotCloud : (CloudResponse -> msg) -> Sub msg

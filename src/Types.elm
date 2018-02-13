@@ -29,6 +29,7 @@ type Wave
     = Sine
     | Triangle
     | Square
+    | Sawtooth
 
 
 type alias ADSR =
@@ -95,7 +96,11 @@ type Msg
     | EditSequence
     | SaveSequence String
     | EditCloud Int
+    | EditRegister Int String String String
     | EditPoints Int String
+    | EditWave Int String Int String
+    | EditADSR Int String Int String String
+    | EditGain Int String Int String
     | EditKey Int String
     | EditTsig Int String
     | EditBars Int String

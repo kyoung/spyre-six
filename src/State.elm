@@ -3,7 +3,7 @@ module State exposing (..)
 import Filters exposing (baseA, createMajorKeyFilter)
 import Json.Encode exposing (encode, object)
 import Maybe
-import Ports exposing (makeCloud, playCloud)
+import Ports exposing (makeCloud, playCloud, updateCloud)
 import Random
 import ToJson exposing (cloudSeedToJSON, modelToJSON)
 import Types
@@ -221,8 +221,172 @@ update action model =
             in
             ( newModel, makeCloud (encode 0 (cloudSeedToJSON newSeed)) )
 
+        EditRegister cloudId register upperOrLower timberValue ->
+            let
+                val =
+                    Result.withDefault 0 (String.toInt timberValue)
+
+                newModel =
+                    updateRegister model cloudId register upperOrLower val
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
+
+        EditWave cloudId register voiceId nuWave ->
+            let
+                wave =
+                    case nuWave of
+                        "Sine" ->
+                            Sine
+
+                        "Sawtooth" ->
+                            Sawtooth
+
+                        "Square" ->
+                            Square
+
+                        "Triangle" ->
+                            Triangle
+
+                        _ ->
+                            Sine
+
+                newModel =
+                    updateWave model cloudId register voiceId wave
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
+
+        EditADSR cloudId register voiceId adsrVal valString ->
+            let
+                val =
+                    Result.withDefault 0 (String.toFloat valString)
+
+                newModel =
+                    updateADSR model cloudId register voiceId adsrVal val
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
+
+        EditGain cloudId register voiceId gainVal ->
+            let
+                gain =
+                    Result.withDefault 0 (String.toFloat gainVal)
+
+                newModel =
+                    updateGain model cloudId register voiceId gain
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
+
         Loop ->
             ( { model | loop = not model.loop }, playCloud (encode 0 (modelToJSON model)) )
+
+
+updateCloud : Model -> Int -> String -> Int -> Float -> Model
+updateCloud model cloudId registerName voiceId gain =
+    let
+        updateVoices idx voice =
+            if idx == voiceId then
+                { voice | gain = gain }
+            else
+                voice
+
+        updateRegisters register =
+            if register.name == registerName then
+                { register | voices = List.indexedMap updateVoices register.voices }
+            else
+                register
+
+        updateClouds cloud =
+            if cloud.id == cloudId then
+                { cloud | registers = List.map updateRegisters cloud.registers }
+            else
+                cloud
+    in
+    { model | clouds = List.map updateClouds model.clouds }
+
+
+updateADSR : Model -> Int -> String -> Int -> String -> Float -> Model
+updateADSR model cloudId registerName voiceId adsrVal val =
+    let
+        updateADSR adsr =
+            case adsrVal of
+                "attack" ->
+                    { adsr | attack = floor val }
+
+                "release" ->
+                    { adsr | release = floor val }
+
+                "decay" ->
+                    { adsr | decay = floor val }
+
+                "sustain" ->
+                    { adsr | sustain = val }
+
+                _ ->
+                    adsr
+
+        updateVoice idx voice =
+            if idx == voiceId then
+                { voice | adsr = updateADSR voice.adsr }
+            else
+                voice
+
+        updateRegister register =
+            if register.name == registerName then
+                { register | voices = List.indexedMap updateVoice register.voices }
+            else
+                register
+
+        updateClouds cloud =
+            if cloud.id == cloudId then
+                { cloud | registers = List.map updateRegister cloud.registers }
+            else
+                cloud
+    in
+    { model | clouds = List.map updateClouds model.clouds }
+
+
+updateWave : Model -> Int -> String -> Int -> Wave -> Model
+updateWave model cloudId registerName voiceId wave =
+    let
+        updateVoice idx voice =
+            if idx == voiceId then
+                { voice | waveform = wave }
+            else
+                voice
+
+        updateRegister register =
+            if register.name == registerName then
+                { register | voices = List.indexedMap updateVoice register.voices }
+            else
+                register
+
+        updateClouds cloud =
+            if cloud.id == cloudId then
+                { cloud | registers = List.map updateRegister cloud.registers }
+            else
+                cloud
+    in
+    { model | clouds = List.map updateClouds model.clouds }
+
+
+updateRegister : Model -> Int -> String -> String -> Int -> Model
+updateRegister model cloudId registerName upperOrLower timberValue =
+    let
+        updateRegister register =
+            if register.name == registerName then
+                if upperOrLower == "upper" then
+                    { register | upperTimber = timberValue }
+                else
+                    { register | lowerTimber = timberValue }
+            else
+                register
+
+        updateClouds cloud =
+            if cloud.id == cloudId then
+                { cloud | registers = List.map updateRegister cloud.registers }
+            else
+                cloud
+    in
+    { model | clouds = List.map updateClouds model.clouds }
 
 
 updateSeed : Model -> CloudSeed -> Int -> Model

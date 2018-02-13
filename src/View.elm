@@ -94,7 +94,10 @@ cloudControls editCloud cloud =
             drawEditCloudSeed cloud.seed
           else
             drawCloudSeed cloud.seed
-        , div [ class "registers" ] (List.map drawRegister cloud.registers)
+        , if cloud.id == editCloud then
+            div [ class "editRegisters" ] (List.map (drawEditRegister cloud.id) cloud.registers)
+          else
+            div [ class "registers" ] (List.map drawRegister cloud.registers)
         ]
 
 
@@ -198,12 +201,103 @@ drawRegister register =
         ]
 
 
+drawEditRegister : Int -> Register -> Html Msg
+drawEditRegister cloudID register =
+    div [ class "bubble", class "register" ]
+        [ span [ class "bubbleTitle" ] [ text (register.name ++ " voices") ]
+        , div [ class "informational" ]
+            [ div [ class "editSpread" ]
+                [ span []
+                    [ text "lower timber" ]
+                , input
+                    [ placeholder (toString register.lowerTimber)
+                    , onInput (EditRegister cloudID register.name "lower")
+                    ]
+                    []
+                ]
+            , div [ class "editSpread" ]
+                [ span []
+                    [ text "upper timber" ]
+                , input
+                    [ placeholder (toString register.upperTimber)
+                    , onInput (EditRegister cloudID register.name "upper")
+                    ]
+                    []
+                ]
+            , hr [] []
+            , div [] []
+            ]
+        , div [ class "voiceBox" ] (List.indexedMap (drawEditVoice cloudID register.name) register.voices)
+        ]
+
+
+drawEditVoice : Int -> String -> Int -> Voice -> Html Msg
+drawEditVoice cloudId registerName voiceId voice =
+    div [ class "voice" ]
+        [ div [ class "informational" ]
+            [ span [] [ text "Waveform" ]
+            , select [ onChange (EditWave cloudId registerName voiceId) ]
+                [ option [ value "Sine" ] [ text "Sine" ]
+                , option [ value "Sawtooth" ] [ text "Sawtooth" ]
+                , option [ value "Square" ] [ text "Square" ]
+                , option [ value "Triangle" ] [ text "Triangle" ]
+                ]
+            ]
+        , drawEditADSR cloudId registerName voiceId voice.adsr
+        , drawEditGain cloudId registerName voicdId voice.gain
+        ]
+
+
 drawVoice : Voice -> Html Msg
 drawVoice voice =
     div [ class "voice" ]
         [ div [ class "informational" ] (emphasisCombo [ "Waveform", toString voice.waveform ] 1)
         , drawADSR voice.adsr
         , drawGain voice.gain
+        ]
+
+
+drawEditADSR : Int -> String -> Int -> ADSR -> Html Msg
+drawEditADSR cloudId registerName voiceId adsr =
+    div [ class "adsr" ]
+        [ div [ class "informational" ]
+            [ div [ class "editSpread" ]
+                [ span []
+                    [ text "Attack" ]
+                , input
+                    [ placeholder (toString adsr.attack)
+                    , onInput (EditADSR cloudId registerName voiceId "attack")
+                    ]
+                    []
+                ]
+            , div [ class "editSpread" ]
+                [ span []
+                    [ text "Decay" ]
+                , input
+                    [ placeholder (toString adsr.decay)
+                    , onInput (EditADSR cloudId registerName voiceId "decay")
+                    ]
+                    []
+                ]
+            , div [ class "editSpread" ]
+                [ span []
+                    [ text "Sustain" ]
+                , input
+                    [ placeholder (toString adsr.sustain)
+                    , onInput (EditADSR cloudId registerName voiceId "sustain")
+                    ]
+                    []
+                ]
+            , div [ class "editSpread" ]
+                [ span []
+                    [ text "Release" ]
+                , input
+                    [ placeholder (toString adsr.release)
+                    , onInput (EditADSR cloudId registerName voiceId "release")
+                    ]
+                    []
+                ]
+            ]
         ]
 
 
@@ -214,6 +308,23 @@ drawADSR adsr =
         , div [ class "informational" ] (emphasisCombo [ "Decay", toString adsr.decay, "ms" ] 1)
         , div [ class "informational" ] (emphasisCombo [ "Sustain", toString (adsr.sustain * 100), "%" ] 1)
         , div [ class "informational" ] (emphasisCombo [ "Release", toString adsr.release, "ms" ] 1)
+        ]
+
+
+drawEditGain : Int -> String -> Int -> Float -> Html Msg
+drawEditGain cloudId registerName voiceId gainVal =
+    div [ class "gain" ]
+        [ div [ class "informational" ]
+            [ div [ class "editSpread" ]
+                [ span []
+                    [ text "Gain" ]
+                , input
+                    [ placeholder (toString gainVal)
+                    , onInput (EditGain cloudId registerName voiceId)
+                    ]
+                    []
+                ]
+            ]
         ]
 
 
