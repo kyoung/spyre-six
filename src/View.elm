@@ -10,6 +10,7 @@ import Types
         , Cloud
         , CloudSeed
         , Filter
+        , FilterType(..)
         , Model
         , Msg(..)
         , Register
@@ -259,21 +260,12 @@ drawEditFilter cloudID registerName filter =
             ]
         , div [ class "editSpread" ]
             [ span []
-                [ text "Gain" ]
-            , input
-                [ placeholder (toString filter.gain)
-                , onInput (EditFilter cloudID registerName "gain")
-                ]
-                []
-            ]
-        , div [ class "editSpread" ]
-            [ span []
                 [ text "Type" ]
             , select [ onChange (EditFilter cloudID registerName "type") ]
-                [ option [ value "LowPass" ] [ text "LowPass" ]
-                , option [ value "HighPass" ] [ text "HighPass" ]
-                , option [ value "BandPass" ] [ text "BandPass" ]
-                , option [ value "Notch" ] [ text "Notch" ]
+                [ option [ value "0", selected (filter.filterType == LowPass) ] [ text "LowPass" ]
+                , option [ value "1", selected (filter.filterType == HighPass) ] [ text "HighPass" ]
+                , option [ value "2", selected (filter.filterType == BandPass) ] [ text "BandPass" ]
+                , option [ value "3", selected (filter.filterType == Notch) ] [ text "Notch" ]
                 ]
             ]
         ]
@@ -284,7 +276,6 @@ drawFilter filter =
     div []
         [ div [ class "informational" ] (emphasisCombo [ "Frequency", toString filter.frequency ] 1)
         , div [ class "informational" ] (emphasisCombo [ "Q", toString filter.q ] 1)
-        , div [ class "informational" ] (emphasisCombo [ "Gain", toString filter.gain ] 1)
         , div [ class "informational" ] (emphasisCombo [ "Type", toString filter.filterType ] 1)
         ]
 

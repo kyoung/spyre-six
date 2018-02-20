@@ -74,9 +74,8 @@ function playNote(frequency, waveform, velocity, adsr, gain, duration, filter) {
   a.gain.setValueAtTime(v * adsr.sustain, drop);
   a.gain.linearRampToValueAtTime(0, end);
 
-  f.frequency = filter.frequency;
-  f.q = filter.q;
-  f.gain = filter.gain;
+  f.frequency.value = filter.frequency;
+  f.Q.value = filter.q;
   f.type = filter.filterType;
 
   o.start();

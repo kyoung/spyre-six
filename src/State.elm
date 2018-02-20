@@ -56,7 +56,7 @@ firstRegister =
     , lowerTimber = 10
     , upperTimber = 5000
     , name = "default"
-    , filter = { frequency = 0, q = 0, gain = 0, filterType = HighPass }
+    , filter = { frequency = 0, q = 0, filterType = HighPass }
     }
 
 
@@ -279,10 +279,63 @@ update action model =
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
         EditFilter cloudId register filterParam valString ->
-            ( model, Cmd.none )
+            let
+                val =
+                    Result.withDefault -1.0 (String.toFloat valString)
+
+                newModel =
+                    updateFilter model cloudId register filterParam val
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
         Loop ->
             ( { model | loop = not model.loop }, playCloud (encode 0 (modelToJSON model)) )
+
+
+updateFilter : Model -> Int -> String -> String -> Float -> Model
+updateFilter model cloudId registerName filterParam paramValue =
+    let
+        updateFilter filter_ =
+            case filterParam of
+                "frequency" ->
+                    { filter_ | frequency = paramValue }
+
+                "q" ->
+                    { filter_ | q = paramValue }
+
+                "type" ->
+                    case floor paramValue of
+                        0 ->
+                            { filter_ | filterType = LowPass }
+
+                        1 ->
+                            { filter_ | filterType = HighPass }
+
+                        2 ->
+                            { filter_ | filterType = BandPass }
+
+                        3 ->
+                            { filter_ | filterType = Notch }
+
+                        _ ->
+                            filter_
+
+                _ ->
+                    filter_
+
+        updateRegisters register =
+            if register.name == registerName then
+                { register | filter = updateFilter register.filter }
+            else
+                register
+
+        updateCloud cloud =
+            if cloud.id == cloudId then
+                { cloud | registers = List.map updateRegisters cloud.registers }
+            else
+                cloud
+    in
+    { model | clouds = List.map updateCloud model.clouds }
 
 
 updateGain : Model -> Int -> String -> Int -> Float -> Model

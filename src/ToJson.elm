@@ -49,10 +49,9 @@ registerToJSON register =
 filterToJSON : Filter -> Value
 filterToJSON filter =
     object
-        [ ( "frequency", int filter.frequency )
+        [ ( "frequency", float filter.frequency )
         , ( "q", float filter.q )
-        , ( "gain", float filter.gain )
-        , ( "filterType", string (toString filter.filterType) )
+        , ( "filterType", string (String.toLower (toString filter.filterType)) )
         ]
 
 

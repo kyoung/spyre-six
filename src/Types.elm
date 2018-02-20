@@ -55,9 +55,8 @@ type FilterType
 
 
 type alias Filter =
-    { frequency : Int
+    { frequency : Float
     , q : Float
-    , gain : Float
     , filterType : FilterType
     }
 
