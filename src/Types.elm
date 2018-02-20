@@ -122,4 +122,5 @@ type Msg
     | EditTempo Int String
     | EditScale Int String
     | EditFilter Int String String String
+    | AddRegister Int
     | Loop

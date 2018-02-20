@@ -3,7 +3,20 @@ body {
 }
 
 .spyre {
+  margin: 0 0 40px 20px;
+}
+
+.spyre h2 {
+  display: inline;
+}
+
+.gitlink {
   margin-left: 20px;
+  color: #aaa;
+}
+
+.gitlink a, .gitlink a:hover{
+  color: #aaa;
 }
 
 .bubble {

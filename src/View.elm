@@ -1,6 +1,6 @@
 module View exposing (..)
 
-import Html exposing (Html, button, div, h2, hr, input, option, p, select, span, text)
+import Html exposing (Html, a, button, div, h2, hr, input, option, p, select, span, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, onInput)
 import Json.Decode as Json
@@ -27,8 +27,13 @@ onChange handler =
 root : Model -> Html Msg
 root model =
     div []
-        [ h2 [ class "spyre" ] [ text "Spyre Six" ]
-        , span [] [ text "github" ]
+        [ div [ class "spyre" ]
+            [ h2 [] [ text "Spyre v6" ]
+            , span [ class "gitlink" ]
+                [ text "experimental music generation--github "
+                , a [ href "https://github.com/kyoung/spyre-six" ] [ text "spyre-six" ]
+                ]
+            ]
         , playBar model.loop model.editSequence model.sequence
         , cloudsDisplay model
         ]
@@ -101,7 +106,7 @@ cloudControls editCloud cloud =
             div [ class "editRegisters" ] (List.map (drawEditRegister cloud.id) cloud.registers)
           else
             div [ class "registers" ] (List.map drawRegister cloud.registers)
-        , div [] [ text "add register" ]
+        , div [ onClick (AddRegister cloud.id) ] [ text "add register" ]
         ]
 
 
@@ -195,7 +200,7 @@ drawCloudSeed seed =
 drawRegister : Register -> Html Msg
 drawRegister register =
     div [ class "bubble", class "register" ]
-        [ span [ class "bubbleTitle" ] [ text (register.name ++ " voices") ]
+        [ span [ class "bubbleTitle" ] [ text (register.name ++ " register voices") ]
         , div []
             [ div [ class "informational" ] [ text ("lower timber " ++ toString register.lowerTimber) ]
             , div [ class "informational" ] [ text ("upper timber " ++ toString register.upperTimber) ]
@@ -209,7 +214,7 @@ drawRegister register =
 drawEditRegister : Int -> Register -> Html Msg
 drawEditRegister cloudID register =
     div [ class "bubble", class "register" ]
-        [ span [ class "bubbleTitle" ] [ text (register.name ++ " voices") ]
+        [ span [ class "bubbleTitle" ] [ text (register.name ++ " register voices") ]
         , div [ class "informational" ]
             [ div [ class "editSpread" ]
                 [ span []

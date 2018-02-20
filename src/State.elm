@@ -55,7 +55,7 @@ firstRegister =
     { voices = [ firstVoice, secondVoice ]
     , lowerTimber = 10
     , upperTimber = 5000
-    , name = "default"
+    , name = "0"
     , filter = { frequency = 0, q = 0, filterType = HighPass }
     }
 
@@ -288,8 +288,34 @@ update action model =
             in
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
+        AddRegister cloudId ->
+            let
+                newModel =
+                    addRegister model cloudId
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
+
         Loop ->
             ( { model | loop = not model.loop }, playCloud (encode 0 (modelToJSON model)) )
+
+
+addRegister : Model -> Int -> Model
+addRegister model cloudId =
+    let
+        nextName registers =
+            let
+                v =
+                    List.length registers
+            in
+            toString v
+
+        updateClouds cloud =
+            if cloud.id == cloudId then
+                { cloud | registers = List.append cloud.registers [ { firstRegister | name = nextName cloud.registers } ] }
+            else
+                cloud
+    in
+    { model | clouds = List.map updateClouds model.clouds }
 
 
 updateFilter : Model -> Int -> String -> String -> Float -> Model
