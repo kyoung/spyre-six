@@ -77,6 +77,32 @@ function beatToVelocity(beat) {
   }
 }
 
+function makeMetronome(cloudSeed) {
+  let n = keyMap[cloudSeed.key]
+  var barTemplate = Array(cloudSeed.tsig.beats).fill().map(() => {
+    return {
+      'frequency': noteToFreq(n*10) * 16,
+      'note': n,
+      'timber': 100,
+      'time': null,
+      'rhythm': null,
+      'velocity': 50,
+    }
+  })
+  barTemplate[0].frequency = noteToFreq(n*10) * 32;
+  var bars = [];
+  for (var i=0; i<cloudSeed.bars; i++) {
+    bars = bars.concat(barTemplate);
+  }
+  let beatInterval = 16 / cloudSeed.tsig.noteValue;
+  let timedBars = bars.map((b, i) => {
+    let r = Math.floor(beatInterval * i);
+    let t = Object.assign({}, b, {rhythm: r, time: Math.floor(beatToTime(r, cloudSeed.tempo))});
+    return t
+  })
+  return timedBars
+}
+
 function makeCloud(cloudSeed) {
   /*
   Given cloudSeed:

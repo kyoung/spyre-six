@@ -18,18 +18,20 @@
 
       app.ports.playCloud.subscribe( function(s) {
         fullState = JSON.parse(s);
-        playLoop = fullState.loop;
         playClouds( fullState );
       } )
 
       app.ports.updateCloud.subscribe( function(s) {
+        console.log("Updating cloud")
         fullState = JSON.parse(s);
       } )
 
       app.ports.makeCloud.subscribe( function(json_seed) {
         let seed = JSON.parse(json_seed)
         app.ports.gotCloud.send(
-            { "points": makeCloud( seed ), "cloudId": seed.cloudId }
+            { "points": makeCloud( seed )
+            , "metronome": makeMetronome( seed )
+            , "cloudId": seed.cloudId }
         )
       } )
 

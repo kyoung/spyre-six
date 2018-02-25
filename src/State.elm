@@ -65,12 +65,14 @@ init =
     ( { clouds =
             [ { seed = firstSeed
               , points = []
+              , metronome = []
               , registers = [ firstRegister ]
               , id = 0
               }
             ]
       , sequence = [ 0 ]
       , loop = False
+      , metronome = False
       , editSequence = False
       , editCloud = -1
       }
@@ -82,7 +84,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
     case action of
         GotCloud cloudResponse ->
-            ( setCloudPoints model cloudResponse.cloudId cloudResponse.points, Cmd.none )
+            let
+                newModel =
+                    setCloudPoints model cloudResponse.cloudId cloudResponse.points cloudResponse.metronome
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
         PlayCloud ->
             ( model, playCloud (encode 0 (modelToJSON model)) )
@@ -115,6 +121,9 @@ update action model =
                         cloudId
             in
             ( { model | editCloud = new_edit_id }, Cmd.none )
+
+        ToggleMetronome ->
+            ( { model | metronome = not model.metronome }, Cmd.none )
 
         EditSequence ->
             ( { model | editSequence = not model.editSequence }, Cmd.none )
@@ -296,7 +305,11 @@ update action model =
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
         Loop ->
-            ( { model | loop = not model.loop }, playCloud (encode 0 (modelToJSON model)) )
+            let
+                newModel =
+                    { model | loop = not model.loop }
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
 
 addRegister : Model -> Int -> Model
@@ -494,7 +507,7 @@ getCloudSeed model cloudId =
     let
         c =
             Maybe.withDefault
-                { seed = firstSeed, id = -1, registers = [], points = [] }
+                { seed = firstSeed, id = -1, registers = [], points = [], metronome = [] }
                 (List.head (List.filter (\c -> c.id == cloudId) model.clouds))
     in
     c.seed
@@ -537,18 +550,19 @@ addCloud model cid =
                   , points = []
                   , registers = [ firstRegister ]
                   , id = cid
+                  , metronome = []
                   }
                 ]
     in
     { model | clouds = updatedClouds model.clouds }
 
 
-setCloudPoints : Model -> Int -> List Point -> Model
-setCloudPoints model cloudId points =
+setCloudPoints : Model -> Int -> List Point -> List Point -> Model
+setCloudPoints model cloudId points metronome =
     let
         updateCloud c =
             if c.id == cloudId then
-                { c | points = points }
+                { c | points = points, metronome = metronome }
             else
                 c
     in

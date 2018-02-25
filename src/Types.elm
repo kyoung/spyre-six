@@ -84,6 +84,7 @@ type alias CloudSeed =
 
 type alias Cloud =
     { points : List Point
+    , metronome : List Point
     , seed : CloudSeed
     , registers : List Register
     , id : Int
@@ -91,13 +92,14 @@ type alias Cloud =
 
 
 type alias CloudResponse =
-    { points : List Point, cloudId : Int }
+    { points : List Point, metronome : List Point, cloudId : Int }
 
 
 type alias Model =
     { clouds : List Cloud
     , sequence : List Int
     , loop : Bool
+    , metronome : Bool
     , editSequence : Bool
     , editCloud : Int
     }
@@ -111,6 +113,7 @@ type Msg
     | EditSequence
     | SaveSequence String
     | EditCloud Int
+    | ToggleMetronome
     | EditRegister Int String String String
     | EditPoints Int String
     | EditWave Int String Int String

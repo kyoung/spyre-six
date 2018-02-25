@@ -3,6 +3,12 @@ var ctx = new AudioContext();
 var voices = 32;
 
 
+function timeToPlayCloud(cloud) {
+  return cloud.seed.bars * cloud.seed.tsig.beats / cloud.seed.tempo * 60 * 1000
+  // return Math.max(...cloud.points.map( p => p.time))
+}
+
+
 function playClouds( state ) {
   var lastEnd = 0
   state.sequence.forEach(function(cloudID) {
@@ -11,11 +17,14 @@ function playClouds( state ) {
     let thisEnd = lastEnd;
     window.setTimeout( function() {
       playCloud(cloud)
+      if ( fullState.metronome ) {
+        playMetronome(cloud)
+      }
     }, thisEnd );
-    let maxTime = Math.max(...cloud.points.map( p => p.time))
+    let maxTime = timeToPlayCloud(cloud);
     lastEnd = thisEnd + maxTime
   })
-  if (playLoop) {
+  if ( state.loop ) {
     window.setTimeout( function () {
       playClouds(fullState)
     }, lastEnd)
@@ -23,11 +32,24 @@ function playClouds( state ) {
 }
 
 
+function playMetronome( cloud ) {
+   console.log("playing metronome " + cloud.id)
+   var notes = cloud.metronome.sort( function (a, b) { return a.time - b.time } );
+   var register = { voices: [ { waveform: 'Sine'
+                              , adsr: { attack: 0, decay: 0, sustain: 100, release: 0 }
+                              , gain: 1
+                              }
+                            ]
+                  , filter: {filterType: 'highpass', frequency: 0, q: 0.0}
+                  }
+  playNotesInRegister( register, notes );
+}
+
+
 function playCloud( cloud ) {
   console.log("playing cloud " + cloud.id)
 
   var notes = cloud.points.sort( function (a, b) { return a.time - b.time  } )
-
 
   for (var i = 0; i< cloud.registers.length; i++) {
 

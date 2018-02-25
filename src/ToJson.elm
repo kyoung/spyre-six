@@ -10,6 +10,7 @@ modelToJSON model =
         [ ( "clouds", list (List.map cloudToJSON model.clouds) )
         , ( "sequence", list (List.map int model.sequence) )
         , ( "loop", bool model.loop )
+        , ( "metronome", bool model.metronome )
         ]
 
 
@@ -17,6 +18,7 @@ cloudToJSON : Cloud -> Value
 cloudToJSON cloud =
     object
         [ ( "points", list (List.map pointToJSON cloud.points) )
+        , ( "metronome", list (List.map pointToJSON cloud.metronome) )
         , ( "seed", cloudSeedToJSON cloud.seed )
         , ( "registers", list (List.map registerToJSON cloud.registers) )
         , ( "id", int cloud.id )

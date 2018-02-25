@@ -34,25 +34,39 @@ root model =
                 , a [ href "https://github.com/kyoung/spyre-six" ] [ text "spyre-six" ]
                 ]
             ]
-        , playBar model.loop model.editSequence model.sequence
+        , playBar model.loop model.editSequence model.sequence model.metronome
         , cloudsDisplay model
         ]
 
 
-playBar : Bool -> Bool -> List Int -> Html Msg
-playBar looping in_edit sequence =
-    let
-        loopText =
-            if looping then
-                "Break Loop"
-            else
-                "Loop"
-    in
+playBar : Bool -> Bool -> List Int -> Bool -> Html Msg
+playBar looping in_edit sequence metronome_active =
     div [ class "bubble" ]
         [ span [ class "bubbleTitle" ] [ text "Playback" ]
         , div [ class "buttonTray" ]
-            [ button [ onClick PlayCloud ] [ text "Play" ]
-            , button [ class "buttonPad", onClick Loop ] [ text loopText ]
+            [ div [ onClick PlayCloud, class "buttonPad" ] [ text "Play" ]
+            , div
+                [ class "buttonPad"
+                , onClick Loop
+                , class
+                    (if looping then
+                        "toggle-on"
+                     else
+                        "toggle-off"
+                    )
+                ]
+                [ text "Loop" ]
+            , div
+                [ onClick ToggleMetronome
+                , class
+                    (if metronome_active then
+                        "toggle-on"
+                     else
+                        "toggle-off"
+                    )
+                , class "buttonPad"
+                ]
+                [ text "Metronome" ]
             , drawSequence sequence in_edit
             ]
         ]
@@ -112,6 +126,13 @@ cloudControls editCloud cloud =
 
 drawEditCloudSeed : CloudSeed -> Html Msg
 drawEditCloudSeed seed =
+    let
+        strOption key =
+            option [ value key, selected (seed.key == key) ] [ text key ]
+
+        strOptionSet options =
+            List.map strOption options
+    in
     div []
         [ div [ class "informational" ]
             [ div [ class "editSpread" ]
@@ -121,24 +142,26 @@ drawEditCloudSeed seed =
             , div [ class "editSpread" ]
                 [ span [] [ text "Key" ]
                 , select [ onChange (EditKey seed.cloudId) ]
-                    [ option [ value "Ab" ] [ text "Ab" ]
-                    , option [ value "A" ] [ text "A" ]
-                    , option [ value "A#" ] [ text "A#" ]
-                    , option [ value "Bb" ] [ text "Bb" ]
-                    , option [ value "B" ] [ text "B" ]
-                    , option [ value "C" ] [ text "C" ]
-                    , option [ value "C#" ] [ text "C#" ]
-                    , option [ value "Db" ] [ text "Db" ]
-                    , option [ value "D" ] [ text "D" ]
-                    , option [ value "D#" ] [ text "D#" ]
-                    , option [ value "Eb" ] [ text "Eb" ]
-                    , option [ value "E" ] [ text "E" ]
-                    , option [ value "F" ] [ text "F" ]
-                    , option [ value "F#" ] [ text "F#" ]
-                    , option [ value "Gb" ] [ text "Gb" ]
-                    , option [ value "G" ] [ text "G" ]
-                    , option [ value "G#" ] [ text "G#" ]
-                    ]
+                    (strOptionSet
+                        [ "Ab"
+                        , "A"
+                        , "A#"
+                        , "Bb"
+                        , "B"
+                        , "C"
+                        , "C#"
+                        , "Db"
+                        , "D"
+                        , "D#"
+                        , "Eb"
+                        , "E"
+                        , "F"
+                        , "F#"
+                        , "Gb"
+                        , "G"
+                        , "G#"
+                        ]
+                    )
                 ]
             , div [ class "editSpread" ]
                 [ span [] [ text "Time Signature" ]
@@ -170,10 +193,7 @@ drawEditCloudSeed seed =
             , div [ class "editSpread" ]
                 [ span [] [ text "Scale" ]
                 , select [ onChange (EditScale seed.cloudId) ]
-                    [ option [ value "major" ] [ text "major" ]
-                    , option [ value "minor" ] [ text "minor" ]
-                    , option [ value "jazz minor" ] [ text "jazz minor" ]
-                    ]
+                    (strOptionSet [ "major", "minor", "jazz minor" ])
                 ]
             ]
         ]
