@@ -120,7 +120,7 @@ cloudControls editCloud cloud =
             div [ class "editRegisters" ] (List.map (drawEditRegister cloud.id) cloud.registers)
           else
             div [ class "registers" ] (List.map drawRegister cloud.registers)
-        , div [ onClick (AddRegister cloud.id) ] [ text "add register" ]
+        , div [ onClick (AddRegister cloud.id), class "buttonPad" ] [ text "add register" ]
         ]
 
 
