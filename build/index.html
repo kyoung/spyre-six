@@ -4,12 +4,12 @@
   <title>Spyre</title>
   <meta charset="utf-8">
   <link rel="stylesheet" href="style.css">
-  <script src="main.js"></script>
 </head>
 <body>
   <div id="elm"></div>
-  <script src="play_cloud.js"></script>
+  <script src="main.js"></script>
   <script src="make_cloud.js"></script>
+  <script src="play_cloud.js"></script>
   <script>
       var node = document.getElementById('elm');
       var app = Elm.Main.embed(node);
@@ -21,10 +21,12 @@
         playClouds( fullState );
       } )
 
+
       app.ports.updateCloud.subscribe( function(s) {
         console.log("Updating cloud")
         fullState = JSON.parse(s);
       } )
+
 
       app.ports.makeCloud.subscribe( function(json_seed) {
         let seed = JSON.parse(json_seed)
@@ -34,7 +36,6 @@
             , "cloudId": seed.cloudId }
         )
       } )
-
   </script>
 </body>
 </html>
