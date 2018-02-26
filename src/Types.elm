@@ -29,6 +29,7 @@ type Wave
     = Sine
     | Triangle
     | Square
+    | Sawtooth
 
 
 type alias ADSR =
@@ -46,11 +47,26 @@ type alias Voice =
     }
 
 
+type FilterType
+    = LowPass
+    | HighPass
+    | BandPass
+    | Notch
+
+
+type alias Filter =
+    { frequency : Float
+    , q : Float
+    , filterType : FilterType
+    }
+
+
 type alias Register =
     { voices : List Voice
     , lowerTimber : Int
     , upperTimber : Int
     , name : String
+    , filter : Filter
     }
 
 
@@ -60,12 +76,15 @@ type alias CloudSeed =
     , count : Int
     , ranges : Ranges
     , bars : Int
+    , tempo : Int
     , cloudId : Int
+    , scale : String
     }
 
 
 type alias Cloud =
     { points : List Point
+    , metronome : List Point
     , seed : CloudSeed
     , registers : List Register
     , id : Int
@@ -73,16 +92,38 @@ type alias Cloud =
 
 
 type alias CloudResponse =
-    { points : List Point, cloudId : Int }
+    { points : List Point, metronome : List Point, cloudId : Int }
 
 
 type alias Model =
     { clouds : List Cloud
     , sequence : List Int
     , loop : Bool
+    , metronome : Bool
+    , editSequence : Bool
+    , editCloud : Int
     }
 
 
 type Msg
     = GotCloud CloudResponse
     | PlayCloud
+    | AddCloud
+    | DeleteCloud Int
+    | EditSequence
+    | SaveSequence String
+    | EditCloud Int
+    | ToggleMetronome
+    | EditRegister Int String String String
+    | EditPoints Int String
+    | EditWave Int String Int String
+    | EditADSR Int String Int String String
+    | EditGain Int String Int String
+    | EditKey Int String
+    | EditTsig Int String
+    | EditBars Int String
+    | EditTempo Int String
+    | EditScale Int String
+    | EditFilter Int String String String
+    | AddRegister Int
+    | Loop

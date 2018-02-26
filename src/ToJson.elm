@@ -10,6 +10,7 @@ modelToJSON model =
         [ ( "clouds", list (List.map cloudToJSON model.clouds) )
         , ( "sequence", list (List.map int model.sequence) )
         , ( "loop", bool model.loop )
+        , ( "metronome", bool model.metronome )
         ]
 
 
@@ -17,6 +18,7 @@ cloudToJSON : Cloud -> Value
 cloudToJSON cloud =
     object
         [ ( "points", list (List.map pointToJSON cloud.points) )
+        , ( "metronome", list (List.map pointToJSON cloud.metronome) )
         , ( "seed", cloudSeedToJSON cloud.seed )
         , ( "registers", list (List.map registerToJSON cloud.registers) )
         , ( "id", int cloud.id )
@@ -42,6 +44,16 @@ registerToJSON register =
         , ( "lowerTimber", int register.lowerTimber )
         , ( "upperTimber", int register.upperTimber )
         , ( "name", string register.name )
+        , ( "filter", filterToJSON register.filter )
+        ]
+
+
+filterToJSON : Filter -> Value
+filterToJSON filter =
+    object
+        [ ( "frequency", float filter.frequency )
+        , ( "q", float filter.q )
+        , ( "filterType", string (String.toLower (toString filter.filterType)) )
         ]
 
 
@@ -73,6 +85,8 @@ cloudSeedToJSON seed =
         , ( "ranges", rangesToJSON seed.ranges )
         , ( "bars", int seed.bars )
         , ( "cloudId", int seed.cloudId )
+        , ( "tempo", int seed.tempo )
+        , ( "scale", string seed.scale )
         ]
 
 

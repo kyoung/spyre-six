@@ -3,7 +3,20 @@ body {
 }
 
 .spyre {
+  margin: 0 0 40px 20px;
+}
+
+.spyre h2 {
+  display: inline;
+}
+
+.gitlink {
   margin-left: 20px;
+  color: #aaa;
+}
+
+.gitlink a, .gitlink a:hover{
+  color: #aaa;
 }
 
 .bubble {
@@ -13,11 +26,39 @@ body {
   margin: 20px;
 }
 
+.addCloud.bubble {
+  border: 1px solid #aaa;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
 span.bubbleTitle {
   position: relative;
   top: -10px;
   left: 10px;
   background: white;
+}
+
+.cloudControl {
+  position: relative;
+}
+
+.delCloud {
+  position: absolute;
+  top: 0px;
+  right: 5px;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.editCloud {
+  position: absolute;
+  top: 4px;
+  right: 20px;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 0.7em;
 }
 
 .clouds {
@@ -51,4 +92,41 @@ span.bubbleTitle {
 
 .description {
   color: #aaa;
+}
+
+.buttonTray {
+  display: flex;
+  align-items: center;
+}
+
+.seqEdit {
+  cursor: pointer;
+  color: #aaa;
+}
+
+.buttonPad {
+  margin: 0 10px 0 10px;
+  cursor: pointer;
+}
+
+.looping {
+  background-color: blue;
+}
+
+.editSpread {
+  display: flex;
+  justify-content: space-between;
+}
+
+.editSpread > input {
+  width: 50px;
+}
+
+.toggle-on {
+    background-color: #333;
+    color: white;
+}
+
+.toggle-off {
+
 }
