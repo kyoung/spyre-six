@@ -66,9 +66,19 @@ span.bubbleTitle {
   flex-direction: horizontal;
 }
 
-.register {
+.register, .addRegister {
   margin-left: 0;
   margin-right: 0;
+}
+
+.addRegister {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding-top: 10px;
+  border-color: #aaa;
 }
 
 .informational {
@@ -129,4 +139,14 @@ span.bubbleTitle {
 
 .toggle-off {
 
+}
+
+.filter {
+  margin-bottom: 20px;
+}
+
+.addVoice {
+  border-left: 1px solid #aaa;
+  margin: 0;
+  padding-left: 10px;
 }

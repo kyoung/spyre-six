@@ -27,6 +27,15 @@ function randInt( min, max ) {
 }
 
 
+function hardMinBiasRandInt( min, max ) {
+  /*
+  The product of three random numbers between 0 and 1 will bias heavily towards
+  the 0... Srsly.
+  */
+  return Math.floor( Math.random() * Math.random() * Math.random() * ( max - min ) ) + min;
+}
+
+
 function randChoice( list ) {
   let r = Math.floor( Math.random() * list.length )
   return list[ r ];
@@ -142,6 +151,21 @@ function randomRhytm( bars, beats, noteValue ) {
 }
 
 
+function randomTimber( min, max ) {
+    /*
+    *Very* loose definition of timber here, meaning mostly a ms value indicating
+    how long the identity of a note is expected to last (eg. a percussive sound
+    has a short timber, while a pad has a long timber).
+
+    Here we're looking mostly to skew the range of randomness towards the lower
+    end to ensure songs aren't overly "pad" heavy and having everything coming
+    out sounding super ambient... though if that's what we want, this is exactly
+    where you'd put that parameter.
+    */
+    return hardMinBiasRandInt(min, max)
+}
+
+
 function makeMetronome ( cloudSeed ) {
   let n = keyMap[ cloudSeed.key ]
   var barTemplate = Array( cloudSeed.tsig.beats ).fill().map( () => {
@@ -199,8 +223,8 @@ function makeCloud ( cloudSeed ) {
     let n = randomNote( scale, key );
     return { 'frequency': noteToFreq( n * 10 )
            , 'note': n
-           , 'timber': randInt( cloudSeed.ranges.minTimber
-                              , cloudSeed.ranges.maxTimber )
+           , 'timber': randomTimber(cloudSeed.ranges.minTimber
+                                   , cloudSeed.ranges.maxTimber )
            , 'time': beatToTime( r, cloudSeed.tempo )
            , 'rhythm': r
            , 'velocity': beatToVelocity( r )
