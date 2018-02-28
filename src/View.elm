@@ -119,8 +119,13 @@ cloudControls editCloud cloud =
         , if cloud.id == editCloud then
             div [ class "editRegisters" ] (List.map (drawEditRegister cloud.id) cloud.registers)
           else
-            div [ class "registers" ] (List.map drawRegister cloud.registers)
-        , div [ onClick (AddRegister cloud.id), class "buttonPad" ] [ text "add register" ]
+            div [ class "registers" ] (List.map (drawRegister cloud.id) cloud.registers)
+        , div
+            [ onClick (AddRegister cloud.id)
+            , class "bubble"
+            , class "addRegister"
+            ]
+            [ div [] [ text "add register" ] ]
         ]
 
 
@@ -217,10 +222,10 @@ drawCloudSeed seed =
         ]
 
 
-drawRegister : Register -> Html Msg
-drawRegister register =
+drawRegister : Int -> Register -> Html Msg
+drawRegister cloudId register =
     div [ class "bubble", class "register" ]
-        [ span [ class "bubbleTitle" ] [ text (register.name ++ " register voices") ]
+        [ span [ class "bubbleTitle" ] [ text ("register " ++ register.name ++ " voices") ]
         , div []
             [ div [ class "informational" ] [ text ("lower timber " ++ toString register.lowerTimber) ]
             , div [ class "informational" ] [ text ("upper timber " ++ toString register.upperTimber) ]
@@ -228,13 +233,19 @@ drawRegister register =
             ]
         , div [ class "voiceBox" ] (List.map drawVoice register.voices)
         , drawFilter register.filter
+        , div
+            [ class "buttonPad"
+            , class "addVoice"
+            , onClick (AddVoice cloudId register.name)
+            ]
+            [ text "add voice" ]
         ]
 
 
 drawEditRegister : Int -> Register -> Html Msg
 drawEditRegister cloudID register =
     div [ class "bubble", class "register" ]
-        [ span [ class "bubbleTitle" ] [ text (register.name ++ " register voices") ]
+        [ span [ class "bubbleTitle" ] [ text ("register " ++ register.name ++ " voices") ]
         , div [ class "informational" ]
             [ div [ class "editSpread" ]
                 [ span []
@@ -259,12 +270,18 @@ drawEditRegister cloudID register =
             ]
         , div [ class "voiceBox" ] (List.indexedMap (drawEditVoice cloudID register.name) register.voices)
         , drawEditFilter cloudID register.name register.filter
+        , div
+            [ class "buttonPad"
+            , class "addVoice"
+            , onClick (AddVoice cloudID register.name)
+            ]
+            [ text "add voice" ]
         ]
 
 
 drawEditFilter : Int -> String -> Filter -> Html Msg
 drawEditFilter cloudID registerName filter =
-    div [ class "informational" ]
+    div [ class "informational", class "filter" ]
         [ div [ class "editSpread" ]
             [ span []
                 [ text "Frequency" ]
@@ -298,7 +315,7 @@ drawEditFilter cloudID registerName filter =
 
 drawFilter : Filter -> Html Msg
 drawFilter filter =
-    div []
+    div [ class "filter" ]
         [ div [ class "informational" ] (emphasisCombo [ "Frequency", toString filter.frequency ] 1)
         , div [ class "informational" ] (emphasisCombo [ "Q", toString filter.q ] 1)
         , div [ class "informational" ] (emphasisCombo [ "Type", toString filter.filterType ] 1)

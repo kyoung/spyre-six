@@ -25,7 +25,7 @@ firstSeed : CloudSeed
 firstSeed =
     { key = "Ab"
     , tsig = { noteValue = 4, beats = 4 }
-    , count = 20
+    , count = 100
     , ranges = { minNote = 210, maxNote = 1080, minTimber = 10, maxTimber = 5000 }
     , cloudId = 0
     , bars = 4
@@ -37,26 +37,62 @@ firstSeed =
 firstVoice : Voice
 firstVoice =
     { waveform = Sine
-    , adsr = { attack = 100, decay = 200, sustain = 0.7, release = 500 }
-    , gain = 0.2
+    , adsr = { attack = 10, decay = 10, sustain = 0, release = 1 }
+    , gain = 1
     }
 
 
 secondVoice : Voice
 secondVoice =
-    { waveform = Triangle
+    { waveform = Sine
     , adsr = { attack = 100, decay = 200, sustain = 0.7, release = 500 }
     , gain = 0.2
     }
 
 
+thirdVoice : Voice
+thirdVoice =
+    { waveform = Sine
+    , adsr = { attack = 3000, decay = 800, sustain = 0.7, release = 3000 }
+    , gain = 0.1
+    }
+
+
+fourthVoice : Voice
+fourthVoice =
+    { waveform = Sine
+    , adsr = { attack = 2500, decay = 1000, sustain = 0.7, release = 2000 }
+    , gain = 0.15
+    }
+
+
 firstRegister : Register
 firstRegister =
-    { voices = [ firstVoice, secondVoice ]
-    , lowerTimber = 10
-    , upperTimber = 5000
+    { voices = [ firstVoice ]
+    , lowerTimber = 1
+    , upperTimber = 100
     , name = "0"
+    , filter = { frequency = 220, q = 0, filterType = LowPass }
+    }
+
+
+secondRegister : Register
+secondRegister =
+    { voices = [ secondVoice ]
+    , lowerTimber = 100
+    , upperTimber = 2000
+    , name = "1"
     , filter = { frequency = 0, q = 0, filterType = HighPass }
+    }
+
+
+thirdRegister : Register
+thirdRegister =
+    { voices = [ thirdVoice, fourthVoice ]
+    , lowerTimber = 2000
+    , upperTimber = 5000
+    , name = "2"
+    , filter = { frequency = 440, q = 0, filterType = LowPass }
     }
 
 
@@ -66,7 +102,7 @@ init =
             [ { seed = firstSeed
               , points = []
               , metronome = []
-              , registers = [ firstRegister ]
+              , registers = [ firstRegister, secondRegister, thirdRegister ]
               , id = 0
               }
             ]
@@ -304,12 +340,37 @@ update action model =
             in
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
+        AddVoice cloudId register ->
+            let
+                newModel =
+                    addVoice model cloudId register
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
+
         Loop ->
             let
                 newModel =
                     { model | loop = not model.loop }
             in
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
+
+
+addVoice : Model -> Int -> String -> Model
+addVoice model cloudId registerName =
+    let
+        updateRegister register =
+            if register.name == registerName then
+                { register | voices = List.append register.voices [ firstVoice ] }
+            else
+                register
+
+        updateClouds cloud =
+            if cloud.id == cloudId then
+                { cloud | registers = List.map updateRegister cloud.registers }
+            else
+                cloud
+    in
+    { model | clouds = List.map updateClouds model.clouds }
 
 
 addRegister : Model -> Int -> Model
