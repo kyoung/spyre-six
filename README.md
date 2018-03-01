@@ -1,13 +1,34 @@
 # Spyre, Attempt Six
 
-*"When I first came here, this was all swamp. Everyone said I was daft to build
-a castle on a swamp, but I built it all the same, just to show them. It sank
-into the swamp. So I built a second one. And that one sank into the swamp. So I
-built a third. That burned down, fell over, and then sank into the swamp. But
-the fourth one stayed up. And that’s what you’re going to get, Son, the
-strongest castle in all of England."
--King of Swamp Castle, The Holy Grail*
+_Latest release hosted (here)[http://LeagueOfVillainy.com/spyre_six]_
 
-*"So every time you stumble never grumble. Next time you'll bumble even less!
-For up from the ashes, up from the ashes, grow the roses of success!"
--Chorus of Tortured Inventors, Chitty Chitty Bang Bang*
+The Sixth attempt made at writing a program to generally compose music based
+on a simple set of input parameters. Originally intended to be a tool used to
+fill out texture and sound for accompaniment by a limited number of live
+musicians.
+
+The basic idea is that each "Cloud" is a set of points in three dimensional
+space, with each axis representing timber (duration of identity of a sound;
+think percussion versus pads), time (location of the point of sound in time; aka
+it's sequence and rhythm), and frequency (aka it's note).
+
+Each of the three dimensions can be combed and biased (eg. How rhythmic do you
+want it? What key should it be in?).
+
+Finally, Clouds can be globally sequenced, and looped.
+
+Each Cloud has a set of registers, which can be tuned to capture points of
+specific timber ranges (and may overlap). This way you can program different
+sounds for different types of notes (eg. Short attacks for percussive sounds).
+
+Each register can have multiple voices, consisting of a simple oscillator and
+ADSR filter, combined through a basic biquad filter. _NB. Eventually
+cross-oscillator behaviour will be supported._
+
+
+## Dragons
+
+Known bugs and problems...
+- It's surprisingly easy to max out the audio context destination node; we'll need to add some compression mechanism to compensate
+- The Elm code is in desperate need of refactor (and the JS and CSS as well)
+- Eventually it would be nice to move the cloud generation code back into Elm once the limitations of the random number generation are sorted out
