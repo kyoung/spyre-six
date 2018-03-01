@@ -31,6 +31,7 @@ firstSeed =
     , bars = 4
     , tempo = 120
     , scale = "major"
+    , percussiveBias = 4
     }
 
 
@@ -39,6 +40,7 @@ firstVoice =
     { waveform = Sine
     , adsr = { attack = 10, decay = 10, sustain = 0, release = 1 }
     , gain = 1
+    , index = 0
     }
 
 
@@ -47,6 +49,7 @@ secondVoice =
     { waveform = Sine
     , adsr = { attack = 100, decay = 200, sustain = 0.7, release = 500 }
     , gain = 0.2
+    , index = 1
     }
 
 
@@ -55,6 +58,7 @@ thirdVoice =
     { waveform = Sine
     , adsr = { attack = 3000, decay = 800, sustain = 0.7, release = 3000 }
     , gain = 0.1
+    , index = 2
     }
 
 
@@ -63,6 +67,7 @@ fourthVoice =
     { waveform = Sine
     , adsr = { attack = 2500, decay = 1000, sustain = 0.7, release = 2000 }
     , gain = 0.15
+    , index = 3
     }
 
 
@@ -72,7 +77,7 @@ firstRegister =
     , lowerTimber = 1
     , upperTimber = 100
     , name = "0"
-    , filter = { frequency = 220, q = 0, filterType = LowPass }
+    , filter = { frequency = 880, q = 0, filterType = LowPass }
     }
 
 
@@ -146,7 +151,25 @@ update action model =
             )
 
         DeleteCloud cloudId ->
-            ( deleteCloud model cloudId, Cmd.none )
+            let
+                newModel =
+                    deleteCloud model cloudId
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
+
+        DeleteRegister cloudId regName ->
+            let
+                newModel =
+                    deleteRegister model cloudId regName
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
+
+        DeleteVoice cloudId regName voiceIdx ->
+            let
+                newModel =
+                    deleteVoice model cloudId regName voiceIdx
+            in
+            ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
         EditCloud cloudId ->
             let
@@ -165,14 +188,19 @@ update action model =
             ( { model | editSequence = not model.editSequence }, Cmd.none )
 
         SaveSequence new_sequence ->
-            ( { model
-                | sequence =
+            let
+                validSeqIDs =
+                    List.map (\c -> c.id) model.clouds
+
+                newSeq =
                     List.map
                         (\s -> Result.withDefault 0 (String.toInt s))
                         (String.split "" new_sequence)
-              }
-            , Cmd.none
-            )
+
+                cleanSeq =
+                    List.filter (\s -> List.member s validSeqIDs) newSeq
+            in
+            ( { model | sequence = cleanSeq }, Cmd.none )
 
         EditPoints cloudId pointCount ->
             let
@@ -184,6 +212,22 @@ update action model =
 
                 newSeed =
                     { oldSeed | count = pc }
+
+                newModel =
+                    updateSeed model newSeed cloudId
+            in
+            ( newModel, makeCloud (encode 0 (cloudSeedToJSON newSeed)) )
+
+        EditPercBias cloudId bias ->
+            let
+                b =
+                    Result.withDefault 0 (String.toInt bias)
+
+                oldSeed =
+                    getCloudSeed model cloudId
+
+                newSeed =
+                    { oldSeed | percussiveBias = b }
 
                 newModel =
                     updateSeed model newSeed cloudId
@@ -279,7 +323,7 @@ update action model =
             in
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
-        EditWave cloudId register voiceId nuWave ->
+        EditWave cloudId register voiceIdx nuWave ->
             let
                 wave =
                     case nuWave of
@@ -299,17 +343,17 @@ update action model =
                             Sine
 
                 newModel =
-                    updateWave model cloudId register voiceId wave
+                    updateWave model cloudId register voiceIdx wave
             in
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
-        EditADSR cloudId register voiceId adsrVal valString ->
+        EditADSR cloudId register voiceIdx adsrVal valString ->
             let
                 val =
                     Result.withDefault 0 (String.toFloat valString)
 
                 newModel =
-                    updateADSR model cloudId register voiceId adsrVal val
+                    updateADSR model cloudId register voiceIdx adsrVal val
             in
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
@@ -358,9 +402,12 @@ update action model =
 addVoice : Model -> Int -> String -> Model
 addVoice model cloudId registerName =
     let
+        nextIdx register =
+            List.length register.voices
+
         updateRegister register =
             if register.name == registerName then
-                { register | voices = List.append register.voices [ firstVoice ] }
+                { register | voices = List.append register.voices [ { firstVoice | index = nextIdx register } ] }
             else
                 register
 
@@ -385,7 +432,14 @@ addRegister model cloudId =
 
         updateClouds cloud =
             if cloud.id == cloudId then
-                { cloud | registers = List.append cloud.registers [ { firstRegister | name = nextName cloud.registers } ] }
+                { cloud
+                    | registers =
+                        List.append cloud.registers
+                            [ { firstRegister
+                                | name = nextName cloud.registers
+                              }
+                            ]
+                }
             else
                 cloud
     in
@@ -441,15 +495,15 @@ updateFilter model cloudId registerName filterParam paramValue =
 updateGain : Model -> Int -> String -> Int -> Float -> Model
 updateGain model cloudId registerName voiceId gain =
     let
-        updateVoices idx voice =
-            if idx == voiceId then
+        updateVoices voice =
+            if voice.index == voiceId then
                 { voice | gain = gain }
             else
                 voice
 
         updateRegisters register =
             if register.name == registerName then
-                { register | voices = List.indexedMap updateVoices register.voices }
+                { register | voices = List.map updateVoices register.voices }
             else
                 register
 
@@ -482,15 +536,15 @@ updateADSR model cloudId registerName voiceId adsrVal val =
                 _ ->
                     adsr
 
-        updateVoice idx voice =
-            if idx == voiceId then
+        updateVoice voice =
+            if voice.index == voiceId then
                 { voice | adsr = updateADSR voice.adsr }
             else
                 voice
 
         updateRegister register =
             if register.name == registerName then
-                { register | voices = List.indexedMap updateVoice register.voices }
+                { register | voices = List.map updateVoice register.voices }
             else
                 register
 
@@ -506,15 +560,15 @@ updateADSR model cloudId registerName voiceId adsrVal val =
 updateWave : Model -> Int -> String -> Int -> Wave -> Model
 updateWave model cloudId registerName voiceId wave =
     let
-        updateVoice idx voice =
-            if idx == voiceId then
+        updateVoice voice =
+            if voice.index == voiceId then
                 { voice | waveform = wave }
             else
                 voice
 
         updateRegister register =
             if register.name == registerName then
-                { register | voices = List.indexedMap updateVoice register.voices }
+                { register | voices = List.map updateVoice register.voices }
             else
                 register
 
@@ -601,6 +655,41 @@ deleteCloud model cid =
     }
 
 
+deleteRegister : Model -> Int -> String -> Model
+deleteRegister model cloudId regName =
+    let
+        updateCloud cloud =
+            if cloud.id == cloudId then
+                { cloud
+                    | registers =
+                        List.filter (\r -> r.name /= regName) cloud.registers
+                }
+            else
+                cloud
+    in
+    { model
+        | clouds = List.map updateCloud model.clouds
+    }
+
+
+deleteVoice : Model -> Int -> String -> Int -> Model
+deleteVoice model cloudId registerName voiceIdx =
+    let
+        updateRegister register =
+            if register.name == registerName then
+                { register | voices = List.filter (\v -> v.index /= voiceIdx) register.voices }
+            else
+                register
+
+        updateCloud cloud =
+            if cloud.id == cloudId then
+                { cloud | registers = List.map updateRegister cloud.registers }
+            else
+                cloud
+    in
+    { model | clouds = List.map updateCloud model.clouds }
+
+
 addCloud : Model -> Int -> Model
 addCloud model cid =
     let
@@ -609,7 +698,7 @@ addCloud model cid =
                 clouds
                 [ { seed = { firstSeed | cloudId = cid }
                   , points = []
-                  , registers = [ firstRegister ]
+                  , registers = [ firstRegister, secondRegister, thirdRegister ]
                   , id = cid
                   , metronome = []
                   }

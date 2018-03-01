@@ -44,6 +44,7 @@ type alias Voice =
     { waveform : Wave
     , adsr : ADSR
     , gain : Float
+    , index : Int
     }
 
 
@@ -79,6 +80,7 @@ type alias CloudSeed =
     , tempo : Int
     , cloudId : Int
     , scale : String
+    , percussiveBias : Int
     }
 
 
@@ -110,12 +112,15 @@ type Msg
     | PlayCloud
     | AddCloud
     | DeleteCloud Int
+    | DeleteRegister Int String
+    | DeleteVoice Int String Int
     | EditSequence
     | SaveSequence String
     | EditCloud Int
     | ToggleMetronome
     | EditRegister Int String String String
     | EditPoints Int String
+    | EditPercBias Int String
     | EditWave Int String Int String
     | EditADSR Int String Int String String
     | EditGain Int String Int String

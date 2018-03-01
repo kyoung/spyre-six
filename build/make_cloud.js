@@ -27,12 +27,20 @@ function randInt( min, max ) {
 }
 
 
-function hardMinBiasRandInt( min, max ) {
+function hardMinBiasRandInt( min, max, q ) {
   /*
-  The product of three random numbers between 0 and 1 will bias heavily towards
-  the 0... Srsly.
+  min - minimum value
+  max - maximum value
+  q - how biased toward the min value (int > 0, but please keep < 10)
+
+  The product of q random numbers between 0 and 1 will bias heavily towards
+  the 0... Srsly
   */
-  return Math.floor( Math.random() * Math.random() * Math.random() * ( max - min ) ) + min;
+  var r = Math.random();
+  for ( var i=0; i<q; i++ ) {
+    r = r * Math.random();
+  }
+  return Math.floor( r * ( max - min ) ) + min;
 }
 
 
@@ -140,10 +148,10 @@ function randomRhytm( bars, beats, noteValue ) {
     return i
   } )
   let barRhythmGrid = Array( bars ).fill().map( ( _, i ) => {
-    return i * beats * ( sixteenth_note_base / noteValue );
+    return Math.floor( i * beats * ( sixteenth_note_base / noteValue ) );
   } )
   let beatBaseRhythmGrid = Array( bars * beats ).fill().map( ( _, i ) => {
-    return i * ( sixteenth_note_base / noteValue );
+    return Math.floor( i * ( sixteenth_note_base / noteValue ) );
   } )
   return randChoice(
       baseRhythmGrid.concat( barRhythmGrid ).concat( beatBaseRhythmGrid )
@@ -151,7 +159,7 @@ function randomRhytm( bars, beats, noteValue ) {
 }
 
 
-function randomTimber( min, max ) {
+function randomTimber( min, max, percussiveBias ) {
     /*
     *Very* loose definition of timber here, meaning mostly a ms value indicating
     how long the identity of a note is expected to last (eg. a percussive sound
@@ -162,7 +170,7 @@ function randomTimber( min, max ) {
     out sounding super ambient... though if that's what we want, this is exactly
     where you'd put that parameter.
     */
-    return hardMinBiasRandInt(min, max)
+    return hardMinBiasRandInt( min, max, percussiveBias )
 }
 
 
@@ -184,7 +192,7 @@ function makeMetronome ( cloudSeed ) {
   }
   let beatInterval = 16 / cloudSeed.tsig.noteValue;
   let timedBars = bars.map( ( b, i ) => {
-    let r = Math.floor(beatInterval * i);
+    let r = Math.floor( beatInterval * i );
     let t = Object.assign( {}
                          , b
                          , { rhythm: r
@@ -192,7 +200,7 @@ function makeMetronome ( cloudSeed ) {
                            }
                          );
     return t
-  })
+  } )
   return timedBars
 }
 
@@ -223,8 +231,9 @@ function makeCloud ( cloudSeed ) {
     let n = randomNote( scale, key );
     return { 'frequency': noteToFreq( n * 10 )
            , 'note': n
-           , 'timber': randomTimber(cloudSeed.ranges.minTimber
-                                   , cloudSeed.ranges.maxTimber )
+           , 'timber': randomTimber( cloudSeed.ranges.minTimber
+                                   , cloudSeed.ranges.maxTimber
+                                   , cloudSeed.percussiveBias )
            , 'time': beatToTime( r, cloudSeed.tempo )
            , 'rhythm': r
            , 'velocity': beatToVelocity( r )
