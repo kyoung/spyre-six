@@ -1,6 +1,6 @@
 # Spyre, Attempt Six
 
-_Latest release hosted (here)[http://LeagueOfVillainy.com/spyre_six]_
+_Latest release hosted [here](http://LeagueOfVillainy.com/spyre_six)_
 
 The Sixth attempt made at writing a program to generally compose music based
 on a simple set of input parameters. Originally intended to be a tool used to
