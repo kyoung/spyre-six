@@ -4,7 +4,6 @@ var voices = 32;
 
 function timeToPlayCloud( cloud ) {
   return cloud.seed.bars * cloud.seed.tsig.beats / cloud.seed.tempo * 60 * 1000
-  // return Math.max(...cloud.points.map( p => p.time))
 }
 
 
@@ -129,6 +128,10 @@ function playClouds( state ) {
 
     // assumes the clouds are in order
     let cloud = state.clouds[ cloudID ];
+    if ( typeof cloud == "undefined" ) {
+      return;
+    }
+
     let thisEnd = lastEnd;
 
     window.setTimeout( function() {

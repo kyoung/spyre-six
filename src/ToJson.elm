@@ -63,6 +63,7 @@ voiceToJSON voice =
         [ ( "waveform", string (toString voice.waveform) )
         , ( "adsr", adsrToJSON voice.adsr )
         , ( "gain", float voice.gain )
+        , ( "index", int voice.index )
         ]
 
 
@@ -87,6 +88,7 @@ cloudSeedToJSON seed =
         , ( "cloudId", int seed.cloudId )
         , ( "tempo", int seed.tempo )
         , ( "scale", string seed.scale )
+        , ( "percussiveBias", int seed.percussiveBias )
         ]
 
 

@@ -52,6 +52,18 @@ span.bubbleTitle {
   cursor: pointer;
 }
 
+.deleteRegister {
+  margin: 0 0 10px 0 !important;
+  color: #aaa;
+  font-size: 0.8em;
+}
+
+.deleteVoice {
+  margin: 0 0 0 0 !important;
+  color: #aaa;
+  font-size: 0.8em;
+}
+
 .editCloud {
   position: absolute;
   top: 4px;

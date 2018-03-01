@@ -132,11 +132,11 @@ cloudControls editCloud cloud =
 drawEditCloudSeed : CloudSeed -> Html Msg
 drawEditCloudSeed seed =
     let
-        strOption key =
-            option [ value key, selected (seed.key == key) ] [ text key ]
+        strOption selectedVal key =
+            option [ value key, selected (selectedVal == key) ] [ text key ]
 
-        strOptionSet options =
-            List.map strOption options
+        strOptionSet selectedVal options =
+            List.map (strOption selectedVal) options
     in
     div []
         [ div [ class "informational" ]
@@ -147,7 +147,7 @@ drawEditCloudSeed seed =
             , div [ class "editSpread" ]
                 [ span [] [ text "Key" ]
                 , select [ onChange (EditKey seed.cloudId) ]
-                    (strOptionSet
+                    (strOptionSet seed.key
                         [ "Ab"
                         , "A"
                         , "A#"
@@ -198,7 +198,14 @@ drawEditCloudSeed seed =
             , div [ class "editSpread" ]
                 [ span [] [ text "Scale" ]
                 , select [ onChange (EditScale seed.cloudId) ]
-                    (strOptionSet [ "major", "minor", "jazz minor" ])
+                    (strOptionSet seed.scale [ "major", "minor", "jazz minor" ])
+                ]
+            , div [ class "editSpread" ]
+                [ span [] [ text "Percussive Bias" ]
+                , select [ onChange (EditPercBias seed.cloudId) ]
+                    (strOptionSet (toString seed.percussiveBias)
+                        [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" ]
+                    )
                 ]
             ]
         ]
@@ -219,6 +226,7 @@ drawCloudSeed seed =
         , div [ class "informational" ] (emphasisCombo [ "Bars", toString seed.bars ] 1)
         , div [ class "informational" ] (emphasisCombo [ "Tempo", toString seed.tempo ] 1)
         , div [ class "informational" ] (emphasisCombo [ "Scale", toString seed.scale ] 1)
+        , div [ class "informational" ] (emphasisCombo [ "Percussive Bias", toString seed.percussiveBias ] 1)
         ]
 
 
@@ -246,6 +254,12 @@ drawEditRegister : Int -> Register -> Html Msg
 drawEditRegister cloudID register =
     div [ class "bubble", class "register" ]
         [ span [ class "bubbleTitle" ] [ text ("register " ++ register.name ++ " voices") ]
+        , div
+            [ class "deleteRegister"
+            , class "buttonPad"
+            , onClick (DeleteRegister cloudID register.name)
+            ]
+            [ text "delete register" ]
         , div [ class "informational" ]
             [ div [ class "editSpread" ]
                 [ span []
@@ -268,7 +282,7 @@ drawEditRegister cloudID register =
             , hr [] []
             , div [] []
             ]
-        , div [ class "voiceBox" ] (List.indexedMap (drawEditVoice cloudID register.name) register.voices)
+        , div [ class "voiceBox" ] (List.map (drawEditVoice cloudID register.name) register.voices)
         , drawEditFilter cloudID register.name register.filter
         , div
             [ class "buttonPad"
@@ -322,20 +336,26 @@ drawFilter filter =
         ]
 
 
-drawEditVoice : Int -> String -> Int -> Voice -> Html Msg
-drawEditVoice cloudId registerName voiceId voice =
+drawEditVoice : Int -> String -> Voice -> Html Msg
+drawEditVoice cloudId registerName voice =
     div [ class "voice" ]
         [ div [ class "informational" ]
             [ span [] [ text "Waveform" ]
-            , select [ onChange (EditWave cloudId registerName voiceId) ]
+            , select [ onChange (EditWave cloudId registerName voice.index) ]
                 [ option [ value "Sine" ] [ text "Sine" ]
                 , option [ value "Sawtooth" ] [ text "Sawtooth" ]
                 , option [ value "Square" ] [ text "Square" ]
                 , option [ value "Triangle" ] [ text "Triangle" ]
                 ]
             ]
-        , drawEditADSR cloudId registerName voiceId voice.adsr
-        , drawEditGain cloudId registerName voiceId voice.gain
+        , drawEditADSR cloudId registerName voice.index voice.adsr
+        , drawEditGain cloudId registerName voice.index voice.gain
+        , div
+            [ onClick (DeleteVoice cloudId registerName voice.index)
+            , class "buttonPad"
+            , class "deleteVoice"
+            ]
+            [ text "delete voice" ]
         ]
 
 
