@@ -28,7 +28,10 @@ cross-oscillator behaviour will be supported._
 
 ## Dragons
 
-Known bugs and problems...
+Known bugs, problems, and plans...
 - It's surprisingly easy to max out the audio context destination node; we'll need to add some compression mechanism to compensate
 - The Elm code is in desperate need of refactor (and the JS and CSS as well)
 - Eventually it would be nice to move the cloud generation code back into Elm once the limitations of the random number generation are sorted out
+- It would be nice to support a wider variety of musical scales and systems--the whole thing is terribly Western-centric at the moment
+- The timing on trigger Loop and Play behavior has some strange interactions and needs to be resolved
+- Dance party mode? (Would probably need the ability to have sub-clouds, or to at least layer a drum machine / simple step sequencer.)
