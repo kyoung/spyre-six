@@ -116,6 +116,7 @@ init =
       , metronome = False
       , editSequence = False
       , editCloud = -1
+      , displayManPage = True
       }
     , makeCloud (encode 0 (cloudSeedToJSON firstSeed))
     )
@@ -397,6 +398,9 @@ update action model =
                     { model | loop = not model.loop }
             in
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
+
+        CloseManPage ->
+            ( { model | displayManPage = False }, Cmd.none )
 
 
 addVoice : Model -> Int -> String -> Model

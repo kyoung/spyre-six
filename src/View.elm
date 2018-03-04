@@ -4,6 +4,7 @@ import Html exposing (Html, a, button, div, h2, hr, input, option, p, select, sp
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, onInput)
 import Json.Decode as Json
+import ManPages exposing (mainDoc)
 import Types
     exposing
         ( ADSR
@@ -96,7 +97,9 @@ cloudsDisplay model =
     div [ class "clouds" ]
         (List.append
             (List.map (cloudControls model.editCloud) model.clouds)
-            [ addCloud ]
+            [ addCloud
+            , mainDoc model.displayManPage
+            ]
         )
 
 

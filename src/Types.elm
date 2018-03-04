@@ -104,6 +104,7 @@ type alias Model =
     , metronome : Bool
     , editSequence : Bool
     , editCloud : Int
+    , displayManPage : Bool
     }
 
 
@@ -132,4 +133,5 @@ type Msg
     | EditFilter Int String String String
     | AddRegister Int
     | AddVoice Int String
+    | CloseManPage
     | Loop
