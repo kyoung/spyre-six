@@ -29,7 +29,7 @@ root : Model -> Html Msg
 root model =
     div []
         [ div [ class "spyre" ]
-            [ h2 [] [ text "Spyre v6" ]
+            [ h2 [] [ text "Spyre(6)" ]
             , span [ class "gitlink" ]
                 [ text "experimental music generation--github "
                 , a [ href "https://github.com/kyoung/spyre-six" ] [ text "spyre-six" ]

@@ -33,6 +33,11 @@ body {
   line-height: 1.5em;
 }
 
+.mainDocumentation iframe {
+  margin-top: 20px;
+  align-self: center;
+}
+
 .bubble {
   border: 1px solid black;
   border-radius: 5px;
@@ -40,7 +45,7 @@ body {
   margin: 20px;
 }
 
-.addCloud.bubble {
+.addCloud.bubble, .showManual.bubble {
   border: 1px solid #aaa;
   display: flex;
   align-items: center;

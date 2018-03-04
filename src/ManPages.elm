@@ -23,7 +23,7 @@ signature determines this underlying grid."""
 bias will yield sounds that are more sharp."""
     , """
 The specific sound a point will then map to is determined by the registers configured for that cloud. Each register
-has a timer range, such that points in that range will play that timber--the effect is that you are able to isolate a
+has a timber range, such that points in that range will play that timber--the effect is that you are able to isolate a
 different sound for your percussive tones than you are for your lead and pad tones.
 """
     , """
@@ -50,15 +50,27 @@ mainDoc display =
             if display then
                 [ class "mainDocumentation", class "bubble" ]
             else
-                []
+                [ class "bubble", class "showManual", onClick ToggleManPage ]
     in
     div classes
         (if display then
-            List.append [ div [ class "closeMan", onClick CloseManPage ] [ text "x" ] ]
+            List.append
+                -- <iframe width="560" height="315" src="https://www.youtube.com/embed/6zx0mZyOK_w" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                [ iframe
+                    [ src "https://www.youtube.com/embed/6zx0mZyOK_w"
+                    , width 560
+                    , height 315
+                    , attribute "frameborder" "0"
+                    , attribute "allow" "autoplay; encrypted-media"
+                    , attribute "allowfullscreen" ""
+                    ]
+                    []
+                , div [ class "closeMan", onClick ToggleManPage ] [ text "x" ]
+                ]
                 (List.map
                     (\block -> p [] [ text block ])
                     docText
                 )
          else
-            []
+            [ text "show Manual" ]
         )

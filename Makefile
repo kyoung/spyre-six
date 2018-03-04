@@ -2,4 +2,4 @@ SHELL := /bin/bash
 
 .PHONY: client
 client:
-	elm-make src/Main.elm --output=build/main.js --debug
+	elm-make src/Main.elm --output=build/main.js

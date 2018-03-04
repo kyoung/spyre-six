@@ -133,5 +133,5 @@ type Msg
     | EditFilter Int String String String
     | AddRegister Int
     | AddVoice Int String
-    | CloseManPage
+    | ToggleManPage
     | Loop

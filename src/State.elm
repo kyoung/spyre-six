@@ -399,19 +399,32 @@ update action model =
             in
             ( newModel, updateCloud (encode 0 (modelToJSON newModel)) )
 
-        CloseManPage ->
-            ( { model | displayManPage = False }, Cmd.none )
+        ToggleManPage ->
+            ( { model | displayManPage = not model.displayManPage }, Cmd.none )
 
 
 addVoice : Model -> Int -> String -> Model
 addVoice model cloudId registerName =
     let
         nextIdx register =
-            List.length register.voices
+            Maybe.withDefault 0
+                (List.head
+                    (List.reverse
+                        (List.sort
+                            (List.map (\v -> v.index) register.voices)
+                        )
+                    )
+                )
+                + 1
 
         updateRegister register =
             if register.name == registerName then
-                { register | voices = List.append register.voices [ { firstVoice | index = nextIdx register } ] }
+                { register
+                    | voices =
+                        List.append
+                            register.voices
+                            [ { firstVoice | index = nextIdx register } ]
+                }
             else
                 register
 
